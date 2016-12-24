@@ -34,6 +34,7 @@ class User {
     this.id = toId(name);
     this.socket = socket;
     this.ip = this.getIP(socket);
+    // DOUBLE CHECK autheitcated spelling!
     this.autheticated = autheticated;
     this.lastMessage = '';
     this.lastMessageTime = Date.now();

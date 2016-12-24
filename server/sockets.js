@@ -82,7 +82,7 @@ function sockets(io/*: Object */) {
       const result = CommandParser.parse(text, Users.get(socket.userId));
       if (result.raw || result.html) {
         Rooms.get(messageObject.room).add(result);
-      } else {
+      } else if (result.text) {
         Rooms.get(messageObject.room).addMessage(messageObject);
       }
       io.to(messageObject.room).emit('load rooms', Rooms.list());

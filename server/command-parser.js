@@ -1,5 +1,30 @@
 // @flow weak
 
+const Rooms = require('./rooms');
+const config = require('./config');
+
+
+const Right = x =>
+({
+  // We introduce the chain function to deal with nested Eithers resulting from
+  // two try/catch calls.
+  chain: f => f(x), // for nested either like Right(Left(e))
+  map: f => Right(f(x)),
+  fold: (f, g) => g(x), // runs right where right is g
+  inspect: () => `Right(${x})`
+});
+
+const Left = x =>
+({
+  chain: f => Left(x),
+  map: f => Left(x), // ignores f
+  fold: (f, g) => f(x), // runs left where left is f
+  inspect: () => `Left(${x})`
+});
+
+const Either = (boolExpr, val) =>
+  boolExpr ? Right(val) : Left(false);
+
 const MAX_MESSAGE_LENGTH = 300;
 const MESSAGE_COOLDOWN = 400;
 const SAME_MESSAGE_COOLDOWN = 5 * 60 * 1000;
@@ -11,6 +36,24 @@ let commands = {
     return {
       text: `Hello ${target}!`
     }
+  },
+  create: 'createchatroom',
+  createchatroom(target, room, user) {
+    // DOUBLE CHECK autheitcated spelling!
+    const normalized = target.trim();
+    return Either(normalized && normalized.length <= 20, user)
+      .fold(() => ({text: 'No target or target cannot be greater than 20 characters.'}),
+            user => Either(config.sysop === user.id && user.autheticated, null)
+                      .fold(() => ({text: 'You don\'t have the permissions to execute this command.'}),
+                            () => ({
+                              text: normalized + ' room is created!',
+                              sideEffect() {
+                                console.log('room created!')
+                                Rooms.create(normalized);
+                                console.log(Rooms.list())
+                              }
+                            }))
+           );
   }
 };
 
@@ -47,7 +90,11 @@ function parse(message/*: string */, user/*: Object */) /*: Object */ {
     if (typeof commandHandler === 'string') {
       commandHandler = commands[commandHandler];
     }
-    const result = commandHandler(target);
+    const result = commandHandler(target, {}, user);
+    if (result.sideEffect) {
+      result.sideEffect();
+      if (!result.text) return {};
+    }
     if (result.text) {
       return Object.assign({}, result, {raw: true});
     }
@@ -75,7 +122,7 @@ function parse(message/*: string */, user/*: Object */) /*: Object */ {
   user.lastMessage = normalized;
 
   // markup here, add 3rd state of v-if to client, change sockets.js
-  return {};
+  return {text: true};
 };
 //
 // function markup(message) {

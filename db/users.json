@@ -8,5 +8,10 @@
     "username": "phil",
     "userId": "phil",
     "hash": "$2a$13$f7W1BeW/mZTLmfHUbBRIpOUkteDl5gzY0nuoaBcvYotjUpEK1w60W"
+  },
+  "admin": {
+    "username": "admin",
+    "userId": "admin",
+    "hash": "$2a$13$FBZcTCVkvC/6yRua9QVE7ewSfw9wQyT9rXSLY5oPO05etV4Ae2KtO"
   }
 }
