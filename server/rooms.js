@@ -46,6 +46,7 @@ class Room {
       hashColor: hashColor(toId(message.username)),
       text: message.text
     });
+    console.log(this.log);
   }
 }
 

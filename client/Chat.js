@@ -54,9 +54,10 @@ const Chat = {
   `,
   methods: {
     createMessage() {
+      console.log(state.rooms.lobby.log);
       const message = this.message.trim();
       const roomName = this.$route.params.id || this.$route.name;
-      if (!state.username || !message) return;
+      if (!state.username || !message) return console.error('No username or message.');
       if (message.length > 300) return;
       socket.emit('chat message', messageSchema.encode({
         username: state.username,

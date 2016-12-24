@@ -20,7 +20,6 @@ socket.on('hash color', (color) => {
 });
 
 socket.on('load rooms', (rooms) => {
-  console.log(1)
   state.rooms = rooms;
 });
 

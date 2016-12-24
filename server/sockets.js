@@ -61,22 +61,25 @@ function sockets(io/*: Object */) {
 
     socket.on('user join room', (roomName) => {
       const room = Rooms.get(toId(roomName));
-      if (!room || !socket.userId) return;
+      if (!room || !socket.userId) return socket.emit('err', 'No room or not login.');
       room.addUser(Users.get(socket.userId).name, socket);
       io.to(roomName).emit('load rooms', Rooms.list());
     });
 
     socket.on('user leave room', (roomName) => {
       const room = Rooms.get(toId(roomName));
-      if (!room || !socket.userId) return;
+      if (!room || !socket.userId) return socket.emit('err', 'No room or not login.');
       room.removeUser(Users.get(socket.userId).name, socket);
       io.to(roomName).emit('load rooms', Rooms.list());
     });
 
     socket.on('chat message', (buffer) => {
-      if (!_.isString(buffer)) return;
+      if (!_.isObject(buffer)) return;
       const messageObject = messageSchema.decode(buffer);
-      const text = messageObject.text;
+      const text = messageObject.text.trim();
+      if (!text || !messageObject.username || !messageObject.room) return socket.emit('err', 'No text, username, or room.');
+      if (text.length > 300) return socket.emit('err', 'Text cannot be greater than 300 characters.');
+      // do some checks here
       if (text.substr(0, 5) === '/join') {
         const parts = text.split(' ');
         console.log(parts);
