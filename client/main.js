@@ -29,7 +29,10 @@ new Vue({
       <router-link to="/" class="navbar-brand">zoa</router-link>
       <ul class="nav navbar-nav">
         <li class="nav-item" v-for="room in rooms">
-          <router-link class="nav-link" v-bind:to="'/room/' + room.id">{{room.name}}</router-link>
+          <router-link class="nav-link" v-bind:to="'/room/' + room.id">
+            <span v-if="$route.params.id == room.id || $route.name == room.id" class="font-weight-bold">{{room.name}}</span>
+            <span v-else>{{room.name}}</span>
+          </router-link>
         </li>
       </ul>
       <ul class="nav navbar-nav float-xs-right" v-if="!username">
