@@ -39,11 +39,10 @@ let commands = {
   },
   create: 'createchatroom',
   createchatroom(target, room, user) {
-    // DOUBLE CHECK autheitcated spelling!
     const normalized = target.trim();
     return Either(normalized && normalized.length <= 20, user)
       .fold(() => ({text: 'No target or target cannot be greater than 20 characters.'}),
-            user => Either(config.sysop === user.id && user.autheticated, null)
+            user => Either(config.sysop === user.id && user.authenticated, null)
                       .fold(() => ({text: 'You don\'t have the permissions to execute this command.'}),
                             () => ({
                               text: normalized + ' room is created!',

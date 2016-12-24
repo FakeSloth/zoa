@@ -4,6 +4,9 @@ import Chat from './Chat';
 import socket from './socket';
 import state from './state';
 
+
+// NOTE: THE PAGE DOESNT REFRESH OR CALL FETCHDATA WHEN U CHANGE TO A NEW ROUTE! NEED TO KNOW HOW TO DO THIS FOR DYNAMIC ROUTES
+
 const UserList = {
   props: ['users'],
   template: `
@@ -43,7 +46,7 @@ const Room = {
   },
   computed: {
     room() {
-      return this.rooms[this.$route.params.id || this.$route.name];
+      return this.rooms[this.$route.params.id || this.$route.name] || {name: 'Lobby', id: 'lobby', users: [], log: []};
     }
   }
 };

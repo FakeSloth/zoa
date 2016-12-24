@@ -23,19 +23,18 @@ class User {
   id: string;
   socket: Socket;
   ip: string;
-  autheticated: bool;
+  authenticated: bool;
   lastMessage: string;
   lastMessageTime: number;
 
   */
 
-  constructor(name/*: string */, socket/*: Socket */, autheticated/*: bool */) {
+  constructor(name/*: string */, socket/*: Socket */, authenticated/*: bool */) {
     this.name = name;
     this.id = toId(name);
     this.socket = socket;
     this.ip = this.getIP(socket);
-    // DOUBLE CHECK autheitcated spelling!
-    this.autheticated = autheticated;
+    this.authenticated = authenticated;
     this.lastMessage = '';
     this.lastMessageTime = Date.now();
   }

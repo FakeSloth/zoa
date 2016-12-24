@@ -23,7 +23,7 @@ function sockets(io/*: Object */) {
       if (Users.isRegistered(username)) return socket.emit('err', 'This username is registered.');
       if (!socket.userId) {
         Users.create(username, socket, false);
-      } else if (Users.get(socket.userId) && Users.get(socket.userId).autheticated) {
+      } else if (Users.get(socket.userId) && Users.get(socket.userId).authenticated) {
         return socket.emit('err', 'You must logout to change from an auth username to an unauth one.');
       } else {
         Users.remove(socket.userId);
