@@ -7,7 +7,6 @@ import socket from './socket';
 import router from './router';
 
 const token = localStorage.getItem('zoa-token');
-console.log(token);
 if (token) {
   axios.post('/auth', {token})
     .then(function (response) {

@@ -8,8 +8,13 @@ const Message = {
   props: ['message'],
   template: `
     <div>
-      <span class="nav-link font-weight-bold" v-bind:style="'color: ' + message.hashColor">{{message.username}}: </span>
-      {{message.text}}
+      <div v-if="message.raw">
+        <span>{{message.text}}</span>
+      </div>
+      <div v-else>
+        <span class="nav-link font-weight-bold" v-bind:style="'color: ' + message.hashColor">{{message.username}}: </span>
+        {{message.text}}
+      </div>
     </div>
   `
 };
@@ -57,7 +62,12 @@ const Chat = {
       console.log(state.rooms.lobby.log);
       const message = this.message.trim();
       const roomName = this.$route.params.id || this.$route.name;
-      if (!state.username || !message) return console.error('No username or message.');
+      if (!this.username) {
+        state.rooms.lobby.log.push({raw: true, text: 'Choose a username to chat.'});
+        this.message = '';
+        return console.error('Must have username to chat.');
+      }
+      if (!message) return console.error('Message cannot be blank.');
       if (message.length > 300) return;
       socket.emit('chat message', messageSchema.encode({
         username: state.username,
