@@ -1,0 +1,50 @@
+.center-block {
+  width: 100%;
+  text-align: center;
+}
+
+.message-list {
+  height:85vh;
+  overflow-y: auto;
+  word-wrap: break-word;
+}
+
+.dropdown {
+  position: relative;
+
+  /** Make it fit tightly around it's children */
+  display: inline-block;
+}
+
+.dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: -120px;
+
+  /** Allow no empty space between this and .dropdown */
+  margin: 0;
+  padding: 0;
+}
+
+/**
+* Apply these styles to .dropdown-menu when user hovers
+* over .dropdown
+*/
+.dropdown:hover .dropdown-menu {
+  /** Show dropdown menu */
+  display: block;
+}
+
+/** List Item Styles **/
+.dropdown li {
+  cursor: pointer;
+  display: block;
+  padding: 0.2em 0.8em;
+  text-decoration: none;
+  color: #333333;
+}
+
+/** List Item Hover Styles **/
+.dropdown li:hover {
+  background: #CCC;
+}
