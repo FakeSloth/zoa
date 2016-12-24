@@ -24,6 +24,8 @@ class User {
   socket: Socket;
   ip: string;
   autheticated: bool;
+  lastMessage: string;
+  lastMessageTime: number;
 
   */
 
@@ -33,6 +35,8 @@ class User {
     this.socket = socket;
     this.ip = this.getIP(socket);
     this.autheticated = autheticated;
+    this.lastMessage = '';
+    this.lastMessageTime = Date.now();
   }
 
   getIP(socket/*: Socket */) /*: string */ {

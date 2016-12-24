@@ -37,16 +37,19 @@ class Room {
     socket.leave(this.id);
   }
 
-  addMessage(message/*: Object */) {
+  add(message/*: Object */) {
     if (this.log.length === 100) {
       this.log.shift();
     }
-    this.log.push({
+    this.log.push(message);
+  }
+
+  addMessage(message/*: Object */) {
+    this.add({
       username: message.username,
       hashColor: hashColor(toId(message.username)),
       text: message.text
     });
-    console.log(this.log);
   }
 }
 

@@ -59,10 +59,9 @@ const Chat = {
   `,
   methods: {
     createMessage() {
-      console.log(state.rooms.lobby.log);
       const message = this.message.trim();
       const roomName = this.$route.params.id || this.$route.name;
-      if (!this.username) {
+      if (!state.username) {
         state.rooms.lobby.log.push({raw: true, text: 'Choose a username to chat.'});
         this.message = '';
         return console.error('Must have username to chat.');

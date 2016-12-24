@@ -8,6 +8,7 @@ const Users = require('./users');
 const Rooms = require('./rooms');
 const hashColor = require('./hashColor');
 const messageSchema = require('../schemas/message');
+const CommandParser = require('./command-parser');
 
 function sockets(io/*: Object */) {
   io.on('connection', function(socket) {
@@ -78,18 +79,13 @@ function sockets(io/*: Object */) {
       const messageObject = messageSchema.decode(buffer);
       const text = messageObject.text.trim();
       if (!text || !messageObject.username || !messageObject.room) return socket.emit('err', 'No text, username, or room.');
-      if (text.length > 300) return socket.emit('err', 'Text cannot be greater than 300 characters.');
-      // do some checks here
-      if (text.substr(0, 5) === '/join') {
-        const parts = text.split(' ');
-        console.log(parts);
-        socket.join(parts[1]);
-        socket.emit('join room', parts[1]);
+      const result = CommandParser.parse(text, Users.get(socket.userId));
+      if (result.raw || result.html) {
+        Rooms.get(messageObject.room).add(result);
       } else {
         Rooms.get(messageObject.room).addMessage(messageObject);
-        io.to(messageObject.room).emit('load rooms', Rooms.list());
-        //io.to(messageObject.room).emit('chat message', buffer);
       }
+      io.to(messageObject.room).emit('load rooms', Rooms.list());
     });
 
     socket.on('disconnect', function(){
