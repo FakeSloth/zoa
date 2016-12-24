@@ -12,7 +12,11 @@ const Users = require('./users');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  if (config.isDev) {
+    res.sendFile(path.join(__dirname, '../public', 'index-dev.html'));
+  } else {
+    res.sendFile(path.join(__dirname, '../public', 'index-prod.html'));
+  }
 });
 
 router.post('/register', (req, res) => {
