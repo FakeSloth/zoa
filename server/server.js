@@ -59,5 +59,5 @@ sockets(io);
 
 server.listen(config.port, (err) => {
   if (err) console.log(err);
-  console.log('==> Listening on port %s in %s mode.', port, app.get('env'));
+  console.log('==> Listening on port %s in %s mode.', config.port, app.get('env'));
 });
