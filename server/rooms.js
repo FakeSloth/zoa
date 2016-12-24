@@ -36,6 +36,17 @@ class Room {
     this.users.splice(this.users.indexOf(username), 1);
     socket.leave(this.id);
   }
+
+  addMessage(message/*: Object */) {
+    if (this.log.length === 100) {
+      this.log.shift();
+    }
+    this.log.push({
+      username: message.username,
+      hashColor: hashColor(toId(message.username)),
+      text: message.text
+    });
+  }
 }
 
 let rooms/*: { [key: string]: Room } */ = {};

@@ -62,18 +62,19 @@ function sockets(io/*: Object */) {
     socket.on('user join room', (roomName) => {
       const room = Rooms.get(toId(roomName));
       if (!room || !socket.userId) return;
-      room.addUser(socket.userId, socket);
+      room.addUser(Users.get(socket.userId).name, socket);
       io.to(roomName).emit('load rooms', Rooms.list());
     });
 
     socket.on('user leave room', (roomName) => {
       const room = Rooms.get(toId(roomName));
       if (!room || !socket.userId) return;
-      room.removeUser(socket.userId, socket);
+      room.removeUser(Users.get(socket.userId).name, socket);
       io.to(roomName).emit('load rooms', Rooms.list());
     });
 
     socket.on('chat message', (buffer) => {
+      if (!_.isString(buffer)) return;
       const messageObject = messageSchema.decode(buffer);
       const text = messageObject.text;
       if (text.substr(0, 5) === '/join') {
@@ -82,11 +83,7 @@ function sockets(io/*: Object */) {
         socket.join(parts[1]);
         socket.emit('join room', parts[1]);
       } else {
-        Rooms.get(messageObject.room).log.push({
-          username: messageObject.username,
-          hashColor: hashColor(toId(messageObject.username)),
-          text: messageObject.text
-        });
+        Rooms.get(messageObject.room).addMessage(messageObject);
         io.to(messageObject.room).emit('load rooms', Rooms.list());
         //io.to(messageObject.room).emit('chat message', buffer);
       }

@@ -56,7 +56,7 @@ const Chat = {
     createMessage() {
       const message = this.message.trim();
       const roomName = this.$route.params.id || this.$route.name;
-      if (!state.username) return;
+      if (!state.username || !message) return;
       if (message.length > 300) return;
       socket.emit('chat message', messageSchema.encode({
         username: state.username,
