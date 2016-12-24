@@ -61,7 +61,7 @@ function sockets(io/*: Object */) {
     });
 
     socket.on('user join room', (roomName) => {
-      const room = Rooms.get(toId(roomName));
+      const room = Rooms.get(roomName);
       if (!room || !socket.userId) return socket.emit('err', 'No room or not login.');
       room.addUser(Users.get(socket.userId).name, socket);
       io.to(roomName).emit('load rooms', Rooms.list());

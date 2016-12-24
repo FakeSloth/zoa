@@ -90,6 +90,7 @@ const Rooms = {
   }
 };
 
-Rooms.create('Lobby')
+Rooms.create('Lobby');
+Rooms.create('Staff');
 
 module.exports = Rooms;

@@ -41,12 +41,16 @@ const Room = {
   `,
   methods: {
     fetchData() {
-      socket.emit('user join room', this.$route.name);
+      socket.emit('user join room', this.roomName);
     }
   },
   computed: {
+    roomName() {
+      return this.$route.params.id || this.$route.name;
+    },
     room() {
-      return this.rooms[this.$route.params.id || this.$route.name] || {name: 'Lobby', id: 'lobby', users: [], log: []};
+      const defaultRoom = {name: 'Lobby', id: 'lobby', users: [], log: []};
+      return this.rooms[this.roomName] || defaultRoom;
     }
   }
 };
