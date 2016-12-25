@@ -32,8 +32,8 @@ class Room {
   }
 
   removeUser(username/*: string */, socket/*: Object */) {
-    if (this.users.indexOf(username) < 0) return;
-    this.users.splice(this.users.indexOf(username), 1);
+    if (this.users.map(toId).indexOf(toId(username)) < 0) return;
+    this.users.splice(this.users.map(toId).indexOf(toId(username)), 1);
     socket.leave(this.id);
   }
 

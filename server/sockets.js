@@ -89,6 +89,7 @@ function sockets(io/*: Object */) {
       } else if (result.text) {
         Rooms.get(messageObject.room).addMessage(messageObject);
       }
+      console.log('UPDATE!')
       io.to(messageObject.room).emit('load rooms', Rooms.list());
     });
 
