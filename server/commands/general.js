@@ -41,9 +41,7 @@ let commands = {
                             () => ({
                               text: normalized + ' room is created!',
                               sideEffect() {
-                                console.log('room created!')
                                 Rooms.create(normalized);
-                                console.log(Rooms.list())
                               }
                             }))
            );
