@@ -1,35 +1,22 @@
 # zoa
 
-> A Vue.js project
+A chat app with room and authentication support.
 
 ## Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn
 
-# serve with hot reload at localhost:8080
-npm run dev
+# serve with hot reload at localhost:3000
+node server/server.js
 
 # build for production with minification
 npm run build
+
+# check for errors
+flow check
 ```
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
-
-# security
-
-when verifying jwt, i check for username on server side
-so need to be login so need to have password and if the hacer
-already have a password the account is already compromised.
-
-we technically expose a JWT
-where gryph expose the JWT and the USERNAME
-We can get the USERNAME by the JWT but we need to decode
-so the hacker would need the secret code
-so gryph WEAKNESS is that it exposes the
-username without the hacker needing to figure out how to decode the JSONWEBTOKEN
-
 
 # How Authentication Works
 
@@ -53,3 +40,7 @@ it won't work because the server checks the database and if no one has login
 yet then it would fail. In addition, if the auth user logouts or switch names,
 they will be remove from auths. If the auth user is currently on the server, the
 server will deny anyone else trying to autheticate themselves as the auth user.
+
+# License
+
+[MIT](LICENSE)
