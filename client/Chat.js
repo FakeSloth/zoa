@@ -11,6 +11,10 @@ const Message = {
       <div v-if="message.raw">
         <span>{{message.text}}</span>
       </div>
+      <div v-else-if="message.htmlUser">
+        <span class="nav-link font-weight-bold" v-bind:style="'color: ' + message.hashColor">{{message.username}}: </span>
+        <span v-html="message.text"></span>
+      </div>
       <div v-else>
         <span class="nav-link font-weight-bold" v-bind:style="'color: ' + message.hashColor">{{message.username}}: </span>
         {{message.text}}

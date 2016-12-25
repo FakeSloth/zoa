@@ -44,12 +44,13 @@ class Room {
     this.log.push(message);
   }
 
-  addMessage(message/*: Object */) {
+  addMessage(message/*: Object */, htmlUser/*: bool */) {
     this.add({
       username: message.username,
       hashColor: hashColor(toId(message.username)),
       text: message.text,
-      date: Date.now()
+      date: Date.now(),
+      htmlUser: htmlUser
     });
   }
 }

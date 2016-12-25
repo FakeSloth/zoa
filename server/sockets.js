@@ -89,8 +89,11 @@ function sockets(io/*: Object */) {
       }
       if (result.raw || result.html) {
         Rooms.get(messageObject.room).add(result);
+      } else if (result.htmlUser) {
+        messageObject.text = result.text
+        Rooms.get(messageObject.room).addMessage(messageObject, true);
       } else if (result.text) {
-        Rooms.get(messageObject.room).addMessage(messageObject);
+        Rooms.get(messageObject.room).addMessage(messageObject, false);
       }
       io.to(messageObject.room).emit('load rooms', Rooms.list());
     });
