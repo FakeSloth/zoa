@@ -38,9 +38,9 @@ function sockets(io/*: Object */) {
 
     socket.on('add auth user', (username) => {
       if (!_.isString(username)) return socket.emit('err', 'Must be a string.');
-      if (username.length > 21) return socket.emit('err', 'Username must be less than 21 characters.');
+      if (toId(username).length > 21) return socket.emit('err', 'Username must be less than 21 characters.');
       if (Users.get(username)) return socket.emit('err', 'Someone is already using that username.');
-      if (!db.auths.get(username)) return socket.emit('err', 'This username has not been authenticated.');
+      if (!db.auths.get(toId(username))) return socket.emit('err', 'This username has not been authenticated.');
       //if (Users.get(socket.userId) && Users.get(socket.userId).registered) return socket.emit('err', 'You cannot add yourself when already auth.');
       Users.create(username, socket, true);
       socket.emit('hash color', hashColor(socket.userId));
