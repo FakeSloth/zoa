@@ -61,7 +61,7 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
   function sendReply(text) {
     return {raw: true, private: true, date: Date.now(), text};
   }
-  
+
   const diff = Date.now() - user.lastMessageTime;
   if (diff < MESSAGE_COOLDOWN) {
     return sendReply('Your message was not sent because you have sented too many messages.');
@@ -97,7 +97,11 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
     const result = commandHandler(target, room, user);
     if (result.sideEffect) {
       result.sideEffect();
-      if (!result.text) return {};
+      if (result.text) {
+        return Object.assign({}, result, {raw: true, private: true, sideEffect: true});
+      } else {
+        return {};
+      }
     }
     if (result.text) {
       return Object.assign({}, result, {raw: true, private: true});

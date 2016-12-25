@@ -81,6 +81,9 @@ function sockets(io/*: Object */) {
       const text = messageObject.text.trim();
       if (!text || !messageObject.username || !messageObject.room) return socket.emit('err', 'No text, username, or room.');
       const result = CommandParser.parse(text, Rooms.get(messageObject.room), Users.get(socket.userId));
+      if (result.sideEffect) {
+        io.emit('load rooms', Rooms.list());
+      }
       if (result.private) {
         return socket.emit('add log', Object.assign({}, result, {room: messageObject.room}));
       }
@@ -89,7 +92,6 @@ function sockets(io/*: Object */) {
       } else if (result.text) {
         Rooms.get(messageObject.room).addMessage(messageObject);
       }
-      console.log('UPDATE!')
       io.to(messageObject.room).emit('load rooms', Rooms.list());
     });
 
