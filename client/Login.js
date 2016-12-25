@@ -54,6 +54,8 @@ const Login = {
           self.username = '';
           self.password = '';
           self.$router.push('/room/lobby');
+        } else {
+          console.error(response.data.error);
         }
       })
       .catch(function (error) {

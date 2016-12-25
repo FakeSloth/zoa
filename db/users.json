@@ -13,5 +13,15 @@
     "username": "admin",
     "userId": "admin",
     "hash": "$2a$13$FBZcTCVkvC/6yRua9QVE7ewSfw9wQyT9rXSLY5oPO05etV4Ae2KtO"
+  },
+  "june": {
+    "username": "june",
+    "userId": "june",
+    "hash": "$2a$13$1NmSTqRDiPXZYrWfJBZ86.E/s6KLZBaNw1slZBWNpWlS03Q2fdeum"
+  },
+  "creaturephil": {
+    "username": "CreaturePhil",
+    "userId": "creaturephil",
+    "hash": "$2a$13$JHKAYJWC.SqMHwU9.fRCceXw1ksBZIc6WC/ir2FYNN6Iy9.i6qchW"
   }
 }
