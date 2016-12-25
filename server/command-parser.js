@@ -1,61 +1,23 @@
-// @flow weak
+// @flow
 
-const Rooms = require('./rooms');
-const config = require('./config');
-
-
-const Right = x =>
-({
-  // We introduce the chain function to deal with nested Eithers resulting from
-  // two try/catch calls.
-  chain: f => f(x), // for nested either like Right(Left(e))
-  map: f => Right(f(x)),
-  fold: (f, g) => g(x), // runs right where right is g
-  inspect: () => `Right(${x})`
-});
-
-const Left = x =>
-({
-  chain: f => Left(x),
-  map: f => Left(x), // ignores f
-  fold: (f, g) => f(x), // runs left where left is f
-  inspect: () => `Left(${x})`
-});
-
-const Either = (boolExpr, val) =>
-  boolExpr ? Right(val) : Left(false);
+const fs = require('fs');
+const path = require('path');
 
 const MAX_MESSAGE_LENGTH = 300;
 const MESSAGE_COOLDOWN = 400;
 const SAME_MESSAGE_COOLDOWN = 5 * 60 * 1000;
 const VALID_COMMAND_TOKENS = '/';
 
-// TODO: move to another file and merge a bunch of commands
-let commands = {
-  hello(target) {
-    return {
-      text: `Hello ${target}!`
-    }
-  },
-  create: 'createchatroom',
-  createchatroom(target, room, user) {
-    const normalized = target.trim();
-    return Either(normalized && normalized.length <= 20, user)
-      .fold(() => ({text: 'No target or target cannot be greater than 20 characters.'}),
-            user => Either(config.sysop === user.id && user.authenticated, null)
-                      .fold(() => ({text: 'You don\'t have the permissions to execute this command.'}),
-                            () => ({
-                              text: normalized + ' room is created!',
-                              sideEffect() {
-                                console.log('room created!')
-                                Rooms.create(normalized);
-                                console.log(Rooms.list())
-                              }
-                            }))
-           );
+function loadCommands() {
+  let cmds = {};
+  for (let file of fs.readdirSync(path.resolve(__dirname, 'commands'))) {
+    if (file.substr(-3) !== '.js') continue;
+    Object.assign(cmds, require('./commands/' + file));
   }
-};
+  return cmds;
+}
 
+const commands = loadCommands();
 
 function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: Object */ {
   function sendReply(text) {
