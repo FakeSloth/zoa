@@ -48,7 +48,8 @@ class Room {
     this.add({
       username: message.username,
       hashColor: hashColor(toId(message.username)),
-      text: message.text
+      text: message.text,
+      date: Date.now()
     });
   }
 }

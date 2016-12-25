@@ -56,15 +56,20 @@ let commands = {
   }
 };
 
-function parse(message/*: string */, user/*: Object */) /*: Object */ {
+
+function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: Object */ {
+  function sendReply(text) {
+    return {raw: true, private: true, date: Date.now(), text};
+  }
+  
   const diff = Date.now() - user.lastMessageTime;
   if (diff < MESSAGE_COOLDOWN) {
-    return {raw: true, text: 'Your message was not sent because you have sented too many messages.'};
+    return sendReply('Your message was not sent because you have sented too many messages.');
   }
   user.lastMessageTime = Date.now();
 
   if (!message || !message.trim().length) {
-    return {raw: true, text: 'Your message cannot be blank.'};
+    return sendReply('Your message cannot be blank.');
   }
 
   let cmd = '', target = '', cmdToken = '';
@@ -89,34 +94,31 @@ function parse(message/*: string */, user/*: Object */) /*: Object */ {
     if (typeof commandHandler === 'string') {
       commandHandler = commands[commandHandler];
     }
-    const result = commandHandler(target, {}, user);
+    const result = commandHandler(target, room, user);
     if (result.sideEffect) {
       result.sideEffect();
       if (!result.text) return {};
     }
     if (result.text) {
-      return Object.assign({}, result, {raw: true});
+      return Object.assign({}, result, {raw: true, private: true});
     }
   } else if (cmdToken) {
-    return {
-      raw: true,
-      text: 'The command \'' + cmdToken + cmd + '\' was unrecognized. To send a message starting with \'' + cmdToken + cmd + '\', type \'' + cmdToken.repeat(2) + cmd + '\'.'
-    };
+    return sendReply('The command \'' + cmdToken + cmd + '\' was unrecognized. To send a message starting with \'' + cmdToken + cmd + '\', type \'' + cmdToken.repeat(2) + cmd + '\'.');
   } else if (isValidCmdToken && isEscapedCmd) {
     message = message.substr(1);
   }
 
   if (message.length > MAX_MESSAGE_LENGTH) {
-    return {raw: true, text: 'Your message cannot be greater than ' + MAX_MESSAGE_LENGTH + 'characters.'};
+    return sendReply('Your message cannot be greater than ' + MAX_MESSAGE_LENGTH + 'characters.');
   }
 
   if (/[\u239b-\u23b9]/.test(message)) {
-    return {raw: true, text: 'Your message contains banned characters.'};
+    return sendReply('Your message contains banned characters.');
   }
 
   const normalized = message.trim();
   if ((normalized === user.lastMessage) && diff < SAME_MESSAGE_COOLDOWN) {
-    return {raw: true, text: 'You can\'t send the same message again so soon.'};
+    return sendReply('You can\'t send the same message again so soon.');
   }
   user.lastMessage = normalized;
 

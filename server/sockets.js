@@ -79,7 +79,10 @@ function sockets(io/*: Object */) {
       const messageObject = messageSchema.decode(buffer);
       const text = messageObject.text.trim();
       if (!text || !messageObject.username || !messageObject.room) return socket.emit('err', 'No text, username, or room.');
-      const result = CommandParser.parse(text, Users.get(socket.userId));
+      const result = CommandParser.parse(text, Rooms.get(messageObject.room), Users.get(socket.userId));
+      if (result.private) {
+        return socket.emit('add log', Object.assign({}, result, {room: messageObject.room}));
+      }
       if (result.raw || result.html) {
         Rooms.get(messageObject.room).add(result);
       } else if (result.text) {
