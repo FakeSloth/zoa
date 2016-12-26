@@ -1,4 +1,4 @@
-# zoa
+# zoa [![Build Status](https://travis-ci.org/FakeSloth/zoa.svg?branch=master)](https://travis-ci.org/FakeSloth/zoa) [![Dependency Status](https://david-dm.org/FakeSloth/zoa.svg)](https://david-dm.org/FakeSloth/zoa) [![devDependency Status](https://david-dm.org/FakeSloth/zoa/dev-status.svg)](https://david-dm.org/FakeSloth/zoa#info=devDependencies)
 
 A chat app with room and authentication support.
 
