@@ -39,6 +39,13 @@ const Room = {
   methods: {
     fetchData() {
       socket.emit('user join room', this.roomName);
+      let self = this;
+      if (state.onInitialLoad) {
+        setTimeout(() => {
+          socket.emit('user join room', this.roomName);
+          state.onInitialLoad = false;
+        }, 1000);
+      }
     }
   },
   computed: {

@@ -24,11 +24,11 @@ socket.on('load rooms', (rooms) => {
 });
 
 socket.on('load room', (room) => {
-  state.rooms[room.id] = room;
+  Vue.set(state.rooms, room.id, room)
 });
 
 socket.on('load room userlist', (room) => {
-  state.rooms[room.id].users = room.users;
+  Vue.set(state.rooms[room.id], 'users', room.users);
 });
 
 socket.on('finish add auth user', () => {

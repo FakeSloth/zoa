@@ -5,6 +5,7 @@ const state = {
   rooms: {
     lobby: {name: 'Lobby', id: 'lobby', users: [], log: []}
   },
+  onInitialLoad: true,
   username: ''
 };
 
