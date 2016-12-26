@@ -14,7 +14,9 @@ function sockets(io/*: Object */) {
   io.on('connection', function(socket) {
     console.log('a user connected');
 
-    socket.emit('load rooms', Rooms.list());
+    socket.activeRooms = {'lobby': 1};
+
+    socket.emit('load rooms', Rooms.list(socket.activeRooms));
 
     socket.on('add choose name user', (username) => {
       if (!_.isString(username)) return socket.emit('err', 'Must be a string.');
@@ -32,8 +34,6 @@ function sockets(io/*: Object */) {
       }
       socket.emit('hash color', hashColor(socket.userId));
       socket.emit('chooseName success', username);
-      console.log('DONE choose name!', Users.list());
-      // update userlist and do other shit
     });
 
     socket.on('add auth user', (username) => {
@@ -46,8 +46,6 @@ function sockets(io/*: Object */) {
       socket.emit('hash color', hashColor(socket.userId));
       socket.emit('chooseName success', username);
       socket.emit('finish add auth user');
-      console.log('DONE auth name!', Users.list());
-      // update userlist and do other shit
     });
 
     socket.on('remove user', () => {
@@ -64,15 +62,25 @@ function sockets(io/*: Object */) {
       const room = Rooms.get(roomName);
       if (!room || !socket.userId) return socket.emit('err', 'No room or not login.');
       if (!Users.get(socket.userId)) return socket.emit('err', 'socket.userId could not get user.');
+      if (!socket.activeRooms[toId(roomName)]) {
+        socket.activeRooms[toId(roomName)] = 1;
+      }
       room.addUser(Users.get(socket.userId).name, socket);
-      io.to(roomName).emit('load rooms', Rooms.list());
+      const roomData = room.data();
+      socket.emit('load room', roomData);
+      io.to(roomName).emit('load room userlist', {id: room.id, users: roomData.users});
     });
 
     socket.on('user leave room', (roomName) => {
       const room = Rooms.get(toId(roomName));
       if (!room || !socket.userId) return socket.emit('err', 'No room or not login.');
+      if (socket.activeRooms[toId(roomName)]) {
+        delete socket.activeRooms[toId(roomName)];
+      }
       room.removeUser(Users.get(socket.userId).name, socket);
-      io.to(roomName).emit('load rooms', Rooms.list());
+      const roomData = room.data();
+      socket.emit('load room', roomData);
+      io.to(roomName).emit('load room userlist', {id: room.id, users: roomData.users});
     });
 
     socket.on('chat message', (buffer) => {

@@ -4,7 +4,6 @@ import io from 'socket.io-client';
 import Vue from 'vue';
 import state from './state';
 import messageSchema from '../schemas/message';
-import {forEach, isEqual, unionWith} from 'lodash';
 
 const socket = io();
 
@@ -21,13 +20,15 @@ socket.on('hash color', (color) => {
 });
 
 socket.on('load rooms', (rooms) => {
-  forEach(rooms, (room, roomName) => {
-    const localRoom = state.rooms[roomName];
-    if (localRoom) {
-      rooms[roomName].log = unionWith(state.rooms[roomName].log, room.log, isEqual);
-    }
-  });
   state.rooms = rooms;
+});
+
+socket.on('load room', (room) => {
+  state.rooms[room.id] = room;
+});
+
+socket.on('load room userlist', (room) => {
+  state.rooms[room.id].users = room.users;
 });
 
 socket.on('finish add auth user', () => {

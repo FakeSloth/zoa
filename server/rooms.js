@@ -26,14 +26,16 @@ class Room {
   }
 
   addUser(username/*: string */, socket/*: Object */) {
-    if (this.users.indexOf(username) >= 0) return;
+    const index = this.users.map(toId).indexOf(toId(username));
+    if (index >= 0) return;
     this.users.push(username);
     socket.join(this.id);
   }
 
   removeUser(username/*: string */, socket/*: Object */) {
-    if (this.users.map(toId).indexOf(toId(username)) < 0) return;
-    this.users.splice(this.users.map(toId).indexOf(toId(username)), 1);
+    const index = this.users.map(toId).indexOf(toId(username));
+    if (index < 0) return;
+    this.users.splice(index, 1);
     socket.leave(this.id);
   }
 
@@ -53,6 +55,15 @@ class Room {
       htmlUser: htmlUser
     });
   }
+
+  data() {
+    return {
+      id: this.id,
+      name: this.name,
+      users: this.users.map(name => ({name, hashColor: hashColor(name)})),
+      log: this.log
+    };
+  }
 }
 
 let rooms/*: { [key: string]: Room } */ = {};
@@ -71,16 +82,12 @@ const Rooms = {
     delete rooms[toId(name)];
   },
 
-  list() /*: Object */ {
+  list(activeRooms/*:? Object */) /*: Object */ {
+    const choosenRooms = activeRooms ? activeRooms: rooms;
     let r = {};
-    for (let id in rooms) {
+    for (let id in choosenRooms) {
       const room = Rooms.get(id);
-      r[id] = {
-        id: room.id,
-        name: room.name,
-        users: room.users.map(name => ({name, hashColor: hashColor(name)})),
-        log: room.log
-      };
+      r[id] = room.data();
     }
     return r;
   },

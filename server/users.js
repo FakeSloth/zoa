@@ -27,6 +27,8 @@ class User {
   lastMessage: string;
   lastMessageTime: number;
 
+  activeRooms: Array<string>;
+
   */
 
   constructor(name/*: string */, socket/*: Socket */, authenticated/*: bool */) {
