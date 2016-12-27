@@ -31,14 +31,14 @@ socket.on('load room userlist', (room) => {
   Vue.set(state.rooms[room.id], 'users', room.users);
 });
 
-socket.on('finish add auth user', () => {
-  socket.emit('user join room', 'lobby');
+socket.on('add room log', (data) => {
+  const room = state.rooms[data.room];
+  if (!room) return console.error('add room log: room does not exist');
+  room.log.push(data);
 });
 
-socket.on('add log', (message) => {
-  const room = state.rooms[message.room];
-  if (!room) return console.error('add log: room does not exist');
-  room.log.push(message);
+socket.on('finish add auth user', () => {
+  socket.emit('user join room', 'lobby');
 });
 
 module.exports = socket;

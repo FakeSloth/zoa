@@ -68,7 +68,7 @@ function sockets(io/*: Object */) {
       room.addUser(Users.get(socket.userId).name, socket);
       const roomData = room.data();
       socket.emit('load room', roomData);
-      io.to(roomName).emit('load room userlist', {id: room.id, users: roomData.users});
+      io.to(roomData.id).emit('load room userlist', {id: room.id, users: roomData.users});
     });
 
     socket.on('user leave room', (roomName) => {
@@ -80,30 +80,31 @@ function sockets(io/*: Object */) {
       room.removeUser(Users.get(socket.userId).name, socket);
       const roomData = room.data();
       socket.emit('load room', roomData);
-      io.to(roomName).emit('load room userlist', {id: room.id, users: roomData.users});
+      io.to(roomData.id).emit('load room userlist', {id: room.id, users: roomData.users});
     });
 
     socket.on('chat message', (buffer) => {
       if (!_.isObject(buffer)) return;
       const messageObject = messageSchema.decode(buffer);
       const text = messageObject.text.trim();
-      if (!text || !messageObject.username || !messageObject.room) return socket.emit('err', 'No text, username, or room.');
-      const result = CommandParser.parse(text, Rooms.get(messageObject.room), Users.get(socket.userId));
+      const room = Rooms.get(messageObject.room);
+      if (!text || !messageObject.username || !room) return socket.emit('err', 'No text, username, or room.');
+
+      const result = CommandParser.parse(text, room, Users.get(socket.userId));
+
       if (result.sideEffect) {
-        io.emit('load rooms', Rooms.list());
+        result.sideEffect(io, socket);
       }
-      if (result.private) {
-        return socket.emit('add log', Object.assign({}, result, {room: messageObject.room}));
+      if (result.raw && result.private) {
+        return socket.emit('add room log', result);
       }
-      if (result.raw || result.html) {
-        Rooms.get(messageObject.room).add(result);
-      } else if (result.htmlUser) {
-        messageObject.text = result.text
-        Rooms.get(messageObject.room).addMessage(messageObject, true);
+      if (result.raw) {
+        room.add(result);
       } else if (result.text) {
-        Rooms.get(messageObject.room).addMessage(messageObject, false);
+        messageObject.text = result.text;
+        room.addMessage(messageObject);
       }
-      io.to(messageObject.room).emit('load rooms', Rooms.list());
+      io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
     });
 
     socket.on('disconnect', function(){

@@ -10,7 +10,7 @@ let commands = {
       text: `Hello ${target}!`
     }
   },
-  
+
   create: 'createroom',
   createroom(target, room, user) {
     const normalized = target.trim();
@@ -19,7 +19,10 @@ let commands = {
     const errPermission = {text: 'You don\'t have the permissions to execute this command.'};
     const successRoom = {
       text: normalized + ' room is created!',
-      sideEffect: () => Rooms.create(normalized)
+      sideEffect: (io, socket) => {
+        Rooms.create(normalized);
+        io.emit('load room', Rooms.get(normalized).data());
+      }
     };
 
     const checkTarget = fromErr(normalized && normalized.length <= 20, errTarget);

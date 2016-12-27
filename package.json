@@ -15,7 +15,7 @@
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
-    "dem-feels": "^1.7.0",
+    "dem-feels": "^1.8.1",
     "express": "^4.14.0",
     "jsonwebtoken": "^7.2.1",
     "lodash": "^4.17.2",

@@ -46,13 +46,12 @@ class Room {
     this.log.push(message);
   }
 
-  addMessage(message/*: Object */, htmlUser/*: bool */) {
+  addMessage(message/*: Object */) {
     this.add({
       username: message.username,
       hashColor: hashColor(toId(message.username)),
       text: message.text,
-      date: Date.now(),
-      htmlUser: htmlUser
+      date: Date.now()
     });
   }
 
@@ -63,6 +62,10 @@ class Room {
       users: this.users.map(name => ({name, hashColor: hashColor(name)})),
       log: this.log
     };
+  }
+
+  peek() {
+    return this.log[this.log.length - 1];
   }
 }
 

@@ -10,12 +10,6 @@ const MESSAGE_COOLDOWN = 400;
 const SAME_MESSAGE_COOLDOWN = 5 * 60 * 1000;
 const VALID_COMMAND_TOKENS = '/';
 
-const LazyBox = g =>
-({
-  map: f => LazyBox(() => f(g())),
-  fold: f => f(g())
-})
-
 function loadCommands() {
   let cmds = {};
   for (let file of fs.readdirSync(path.resolve(__dirname, 'commands'))) {
@@ -29,7 +23,7 @@ const commands = loadCommands();
 
 function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: Object */ {
   function sendReply(text) {
-    return {raw: true, private: true, date: Date.now(), text};
+    return {raw: true, private: true, date: Date.now(), text, room: room.id};
   }
 
   const diff = Date.now() - user.lastMessageTime;
@@ -66,15 +60,14 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
     }
     const result = commandHandler(target, room, user);
     if (result.sideEffect) {
-      LazyBox(result.sideEffect).fold(function() {});
       if (result.text) {
-        return Object.assign({}, result, {raw: true, private: true, sideEffect: true});
+        return Object.assign(result, {raw: true, private: true, room: room.id});
       } else {
-        return {};
+        return result;
       }
     }
     if (result.text) {
-      return Object.assign({}, result, {raw: true, private: true});
+      return Object.assign(result, {raw: true, private: true, room: room.id});
     }
   } else if (cmdToken) {
     return sendReply('The command \'' + cmdToken + cmd + '\' was unrecognized. To send a message starting with \'' + cmdToken + cmd + '\', type \'' + cmdToken.repeat(2) + cmd + '\'.');
@@ -97,7 +90,7 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
   user.lastMessage = normalized;
 
   // markup here, add 3rd state of v-if to client, change sockets.js
-  return {text: markup(normalized), htmlUser: true};
+  return {text: markup(normalized)};
 };
 
 function markup(message) {
