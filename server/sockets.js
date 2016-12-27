@@ -102,7 +102,7 @@ function sockets(io/*: Object */) {
       if (result.raw) {
         room.add(result);
       } else if (result.text) {
-        messageObject.text = result.text;
+        Object.assign(messageObject, result);
         room.addMessage(messageObject);
       }
       io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));

@@ -96,7 +96,7 @@ const Chat = {
       const index = filtered.length - this.negativeIndex;
       const message = filtered[index];
       if (!message) return;
-      this.message = message.text;
+      this.message = message.originalText;
       this.negativeIndex += num;
     }
   }

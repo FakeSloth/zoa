@@ -51,6 +51,7 @@ class Room {
       username: message.username,
       hashColor: hashColor(toId(message.username)),
       text: message.text,
+      originalText: message.originalText,
       date: Date.now()
     });
   }

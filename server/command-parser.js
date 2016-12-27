@@ -89,8 +89,7 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
   }
   user.lastMessage = normalized;
 
-  // markup here, add 3rd state of v-if to client, change sockets.js
-  return {text: markup(normalized)};
+  return {text: markup(normalized), originalText: normalized};
 };
 
 function markup(message) {
