@@ -53,7 +53,8 @@ const Chat = {
   data() {
     return {
       message: '',
-      negativeIndex: 1
+      negativeIndex: 1,
+      isShifting: false
     };
   },
   components: {
@@ -62,10 +63,12 @@ const Chat = {
   template: `
     <div class="col-sm-10">
       <MessageList v-bind:messages="messageList" />
-      <input
-        type="text"
-        class="form-control"
+      <textarea
+        rows="1"
+        autocomplete="off"
+        class="form-control textbox"
         v-model="message"
+        v-on:keyup.shift.enter="shifting"
         v-on:keyup.enter="createMessage"
         v-on:keyup.up="pastMessage(1)"
         v-on:keyup.down="pastMessage(-1)"
@@ -73,7 +76,12 @@ const Chat = {
     </div>
   `,
   methods: {
+    shifting() {
+      this.isShifting = true;
+      setTimeout(() => this.isShifting = false, 150);
+    },
     createMessage() {
+      if (this.isShifting) return;
       const message = this.message.trim();
       const roomName = this.$route.params.id || this.$route.name;
       if (!state.username) {

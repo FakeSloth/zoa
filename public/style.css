@@ -52,3 +52,8 @@
 img {
   vertical-align: baseline;
 }
+
+.textbox {
+  resize: none;
+  overflow-y: hidden;
+}
