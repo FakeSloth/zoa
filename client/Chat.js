@@ -52,7 +52,8 @@ const Chat = {
   props: ['messageList'],
   data() {
     return {
-      message: ''
+      message: '',
+      negativeIndex: 1
     };
   },
   components: {
@@ -66,6 +67,8 @@ const Chat = {
         class="form-control"
         v-model="message"
         v-on:keyup.enter="createMessage"
+        v-on:keyup.up="pastMessage(1)"
+        v-on:keyup.down="pastMessage(-1)"
       />
     </div>
   `,
@@ -86,6 +89,15 @@ const Chat = {
         text: message
       }));
       this.message = '';
+      this.negativeIndex = 1;
+    },
+    pastMessage(num /*: number */) {
+      const filtered = this.messageList.filter(m => m.username === state.username);
+      const index = filtered.length - this.negativeIndex;
+      const message = filtered[index];
+      if (!message) return;
+      this.message = message.text;
+      this.negativeIndex += num;
     }
   }
 };
