@@ -85,27 +85,31 @@ function sockets(io/*: Object */) {
 
     socket.on('chat message', (buffer) => {
       if (!_.isObject(buffer)) return;
-      const messageObject = messageSchema.decode(buffer);
-      const text = messageObject.text.trim();
-      const room = Rooms.get(messageObject.room);
-      if (!text || !messageObject.username || !room) return socket.emit('err', 'No text, username, or room.');
-      if (!socket.userId) return socket.emit('err', 'Must have name to chat.');
+      try {
+        const messageObject = messageSchema.decode(buffer);
+        const text = messageObject.text.trim();
+        const room = Rooms.get(messageObject.room);
+        if (!text || !messageObject.username || !room) return socket.emit('err', 'No text, username, or room.');
+        if (!socket.userId) return socket.emit('err', 'Must have name to chat.');
 
-      const result = CommandParser.parse(text, room, Users.get(socket.userId));
+        const result = CommandParser.parse(text, room, Users.get(socket.userId));
 
-      if (result.sideEffect) {
-        result.sideEffect(io, socket);
+        if (result.sideEffect) {
+          result.sideEffect(io, socket);
+        }
+        if (result.raw && result.private) {
+          return socket.emit('add room log', result);
+        }
+        if (result.raw) {
+          room.add(result);
+        } else if (result.text) {
+          Object.assign(messageObject, result);
+          room.addMessage(messageObject);
+        }
+        io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
+      } catch (e) {
+        console.error(e);
       }
-      if (result.raw && result.private) {
-        return socket.emit('add room log', result);
-      }
-      if (result.raw) {
-        room.add(result);
-      } else if (result.text) {
-        Object.assign(messageObject, result);
-        room.addMessage(messageObject);
-      }
-      io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
     });
 
     socket.on('disconnect', function(){
