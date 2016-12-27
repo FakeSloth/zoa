@@ -1,13 +1,17 @@
 // @flow
 
+import ms from 'ms';
 import socket from './socket';
 import messageSchema from '../schemas/message';
 import state from './state';
 
 const Message = {
   props: ['message'],
+  data() {
+    return {title: ''};
+  },
   template: `
-    <div>
+    <div v-on:mouseover="fromNow" v-bind:title="title">
       <div v-if="message.raw">
         <span>{{message.text}}</span>
       </div>
@@ -19,7 +23,12 @@ const Message = {
         <span v-html="message.text"></span>
       </div>
     </div>
-  `
+  `,
+  methods: {
+    fromNow() {
+      this.title = ms(Date.now() - this.message.date, { long: true }) + ' ago';
+    }
+  }
 };
 
 const MessageList = {

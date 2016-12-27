@@ -89,6 +89,7 @@ function sockets(io/*: Object */) {
       const text = messageObject.text.trim();
       const room = Rooms.get(messageObject.room);
       if (!text || !messageObject.username || !room) return socket.emit('err', 'No text, username, or room.');
+      if (!socket.socketId) return socket.emit('err', 'Must have name to chat.');
 
       const result = CommandParser.parse(text, room, Users.get(socket.userId));
 
