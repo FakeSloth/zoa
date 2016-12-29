@@ -32,7 +32,7 @@ socket.on('load rooms', (rooms) => {
 });
 
 socket.on('load room', (room) => {
-  Vue.set(state.rooms, room.id, room)
+  Vue.set(state.rooms, room.id, room);
 });
 
 socket.on('load room userlist', (room) => {
@@ -54,17 +54,8 @@ socket.on('user join room', (roomName) => {
   GLOBAL_ROUTER.push(`/room/${roomName}`);
 });
 
-function nonreactive(value) {
-  const Observer = (new Vue()).$data.__ob__.constructor;
-
-  // Set dummy observer on value
-  value.__ob__ = new Observer({});
-  return value;
-};
-
 socket.on('user leave room', (roomName) => {
   socket.emit('user leave room', roomName);
-  nonreactive(state.rooms);
   const rooms = state.rooms;
   delete rooms[roomName];
   Vue.set(state, 'rooms', rooms);

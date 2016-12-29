@@ -3,6 +3,7 @@
 const Rooms = require('../rooms');
 const config = require('../config');
 const {fromErr} = require('../fp');
+const toId = require('toid');
 
 let commands = {
   hello(target) {
@@ -23,6 +24,7 @@ let commands = {
         Rooms.create(normalized);
         io.emit('load room', Rooms.get(normalized).data());
         io.emit('load all rooms', Rooms.listAll());
+        socket.emit('user join room', toId(normalized));
       }
     };
 

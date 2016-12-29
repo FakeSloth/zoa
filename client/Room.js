@@ -3,6 +3,7 @@
 import Chat from './Chat';
 import socket from './socket';
 import state from './state';
+import toId from 'toid';
 
 const UserList = {
   props: ['users'],
@@ -53,7 +54,7 @@ const Room = {
       return this.$route.params.id || this.$route.name;
     },
     room() {
-      const defaultRoom = {name: 'Lobby', id: 'lobby', users: [], log: []};
+      const defaultRoom = {name: this.roomName, id: toId(this.roomName), users: [], log: []};
       return this.rooms[this.roomName] || defaultRoom;
     }
   }
