@@ -43,6 +43,14 @@ socket.on('add room log', (data) => {
   const room = state.rooms[data.room];
   if (!room) return console.error('add room log: room does not exist');
   room.log.push(data);
+  if (window.Notification && Notification.permission !== "denied") {
+    Notification.requestPermission(function(status) {
+      alert('ran');
+      let notif = new Notification('ZOA Alert', {
+        body: 'New message in ' + room.name + '!',
+      });
+    });
+  }
 });
 
 socket.on('finish add auth user', () => {
