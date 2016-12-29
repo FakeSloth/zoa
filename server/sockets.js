@@ -17,6 +17,7 @@ function sockets(io/*: Object */) {
     socket.activeRooms = {'lobby': 1};
 
     socket.emit('load rooms', Rooms.list(socket.activeRooms));
+    socket.emit('load all rooms', Rooms.listAll());
 
     socket.on('add choose name user', (username) => {
       if (!_.isString(username)) return socket.emit('err', 'Must be a string.');
@@ -53,8 +54,8 @@ function sockets(io/*: Object */) {
         Users.remove(socket.userId);
         db.auths.remove(socket.userId);
         Rooms.removeUser(socket.userId, socket);
-        console.log('list:', Rooms.list())
         io.emit('load rooms', Rooms.list());
+        io.emit('load all rooms', Rooms.listAll());
       }
     });
 
@@ -69,6 +70,7 @@ function sockets(io/*: Object */) {
       const roomData = room.data();
       socket.emit('load room', roomData);
       io.to(roomData.id).emit('load room userlist', {id: room.id, users: roomData.users});
+      io.emit('load all rooms', Rooms.listAll());
     });
 
     socket.on('user leave room', (roomName) => {
@@ -80,6 +82,7 @@ function sockets(io/*: Object */) {
       room.removeUser(Users.get(socket.userId).name, socket);
       const roomData = room.data();
       io.to(roomData.id).emit('load room userlist', {id: room.id, users: roomData.users});
+      io.emit('load all rooms', Rooms.listAll());
     });
 
     socket.on('chat message', (buffer) => {

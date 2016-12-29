@@ -22,6 +22,7 @@ let commands = {
       sideEffect(io, socket) {
         Rooms.create(normalized);
         io.emit('load room', Rooms.get(normalized).data());
+        io.emit('load all rooms', Rooms.listAll());
       }
     };
 

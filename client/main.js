@@ -36,6 +36,9 @@ new Vue({
         </li>
       </ul>
       <ul class="nav navbar-nav float-xs-right" v-if="!username">
+        <li class="nav-item" title="View all rooms">
+          <router-link to="/rooms" class="nav-link">+</router-link>
+        </li>
         <li class="nav-item">
           <router-link to="/choose-name" class="nav-link">Choose name</router-link>
         </li>
@@ -44,6 +47,9 @@ new Vue({
         </li>
       </ul>
       <ul class="nav navbar-nav float-xs-right" v-else>
+        <li class="nav-item" title="View all rooms">
+          <router-link to="/rooms" class="nav-link">+</router-link>
+        </li>
         <li class="nav-item">
           <div class="dropdown">
             <span class="nav-link font-weight-bold" v-bind:style="'color: ' + hashColor">{{username}}</span>
@@ -55,7 +61,7 @@ new Vue({
         </li>
       </ul>
     </nav>
-    <router-view v-bind:rooms="rooms"></router-view>
+    <router-view v-bind:rooms="rooms" v-bind:allRooms="allRooms"></router-view>
   </div>
   `,
   methods: {

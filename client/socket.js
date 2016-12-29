@@ -23,6 +23,10 @@ socket.on('hash color', (color) => {
   state.hashColor = color;
 });
 
+socket.on('load all rooms', (allRooms) => {
+  state.allRooms = allRooms;
+});
+
 socket.on('load rooms', (rooms) => {
   state.rooms = rooms;
 });

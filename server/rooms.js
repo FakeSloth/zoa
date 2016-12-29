@@ -100,6 +100,15 @@ const Rooms = {
     return r;
   },
 
+  listAll() {
+    let r = [];
+    for (let id in rooms) {
+      const room = rooms[id];
+      r.push({id: room.id, name: room.name, userCount: room.users.length});
+    }
+    return r;
+  },
+
   removeUser(userId/*: string */, socket/*: Object */) {
     for (let id in rooms) {
       rooms[id].removeUser(userId, socket);
