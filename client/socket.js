@@ -45,7 +45,6 @@ socket.on('add room log', (data) => {
   room.log.push(data);
   if (window.Notification && Notification.permission !== "denied") {
     Notification.requestPermission(function(status) {
-      alert('ran');
       let notif = new Notification('ZOA Alert', {
         body: 'New message in ' + room.name + '!',
       });
