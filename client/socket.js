@@ -1,9 +1,13 @@
-// @flow
+// @flow weak
 
 import io from 'socket.io-client';
 import Vue from 'vue';
 import state from './state';
 import messageSchema from '../schemas/message';
+
+/* flow-include
+  declare var GLOBAL_ROUTER: any;
+*/
 
 const socket = io();
 
@@ -39,6 +43,33 @@ socket.on('add room log', (data) => {
 
 socket.on('finish add auth user', () => {
   socket.emit('user join room', 'lobby');
+});
+
+socket.on('user join room', (roomName) => {
+  socket.emit('user join room', roomName);
+  GLOBAL_ROUTER.push(`/room/${roomName}`);
+});
+
+function nonreactive(value) {
+  const Observer = (new Vue()).$data.__ob__.constructor;
+
+  // Set dummy observer on value
+  value.__ob__ = new Observer({});
+  return value;
+};
+
+socket.on('user leave room', (roomName) => {
+  socket.emit('user leave room', roomName);
+  nonreactive(state.rooms);
+  const rooms = state.rooms;
+  delete rooms[roomName];
+  Vue.set(state, 'rooms', rooms);
+  const roomNames = Object.keys(state.rooms);
+  if (!roomNames.length) {
+    GLOBAL_ROUTER.push('/room/lobby');
+  } else {
+    GLOBAL_ROUTER.push(`/room/${roomNames[roomNames.length - 1]}`);
+  }
 });
 
 module.exports = socket;

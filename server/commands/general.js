@@ -19,7 +19,7 @@ let commands = {
     const errPermission = {text: 'You don\'t have the permissions to execute this command.'};
     const successRoom = {
       text: normalized + ' room is created!',
-      sideEffect: (io, socket) => {
+      sideEffect(io, socket) {
         Rooms.create(normalized);
         io.emit('load room', Rooms.get(normalized).data());
       }
@@ -32,7 +32,35 @@ let commands = {
       .chain(() => checkPermissions)
       .fold(e => e,
             () => successRoom);
-  }
+  },
+
+  join: 'joinroom',
+  joinroom(target, room, user) {
+    const joinRoom = Rooms.get(target);
+
+    const successJoin = {
+      sideEffect(io, socket) {
+        socket.emit('user join room', joinRoom.id);
+      }
+    };
+
+    return fromErr(joinRoom, {text: `${target} room does not exist.`})
+      .fold(e => e,
+            () => successJoin);
+  },
+
+  leave: 'leaveroom',
+  leaveroom(target, room, user) {
+    const successLeave = {
+      sideEffect(io, socket) {
+        socket.emit('user leave room', room.id);
+      }
+    };
+
+    return fromErr(room.hasUser(user.id), {text: 'You are not in this room.'})
+      .fold(e => e,
+            () => successLeave);
+  },
 };
 
 module.exports = commands;

@@ -25,6 +25,10 @@ class Room {
     this.id = toId(name);
   }
 
+  hasUser(username/*: string */) {
+    return this.users.map(toId).indexOf(toId(username)) >= 0;
+  }
+
   addUser(username/*: string */, socket/*: Object */) {
     const index = this.users.map(toId).indexOf(toId(username));
     if (index >= 0) return;

@@ -18,5 +18,6 @@ const routes = [
 const router = new VueRouter({
   routes
 });
+global.GLOBAL_ROUTER = router;
 
 module.exports = router;

@@ -79,7 +79,6 @@ function sockets(io/*: Object */) {
       }
       room.removeUser(Users.get(socket.userId).name, socket);
       const roomData = room.data();
-      socket.emit('load room', roomData);
       io.to(roomData.id).emit('load room userlist', {id: room.id, users: roomData.users});
     });
 
@@ -102,11 +101,12 @@ function sockets(io/*: Object */) {
         }
         if (result.raw) {
           room.add(result);
+          io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
         } else if (result.text) {
           Object.assign(messageObject, result);
           room.addMessage(messageObject);
+          io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
         }
-        io.to(room.id).emit('add room log', Object.assign(room.peek(), {room: room.id}));
       } catch (e) {
         console.error(e);
       }
