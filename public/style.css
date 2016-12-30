@@ -36,15 +36,17 @@
 }
 
 /** List Item Styles **/
+.dropdown a,
 .dropdown li {
   cursor: pointer;
   display: block;
-  padding: 0.2em 0.8em;
+  padding: 0.8%;
   text-decoration: none;
   color: #333333;
 }
 
 /** List Item Hover Styles **/
+.dropdown a:hover,
 .dropdown li:hover {
   background: #CCC;
 }
@@ -56,4 +58,17 @@ img {
 .textbox {
   resize: none;
   overflow-y: hidden;
+}
+
+/** Settings Styles **/
+.settings {
+    margin: 0 auto;
+}
+
+.settings h6 {
+    margin-top: 1%;
+}
+
+#options {
+    margin-left: 3%;
 }

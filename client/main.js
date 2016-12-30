@@ -56,6 +56,7 @@ new Vue({
             <span class="nav-link font-weight-bold" v-bind:style="'color: ' + hashColor">{{username}}</span>
             <ul class="dropdown-menu">
               <li v-on:click="handleLogout('/choose-name')">Change Name</li>
+              <li><router-link to="/settings">Settings</router-link></li>
               <li v-on:click="handleLogout('/login')">Logout</li>
             </ul>
           </div>
