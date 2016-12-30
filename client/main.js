@@ -31,6 +31,7 @@ new Vue({
         <li class="nav-item" v-for="room in rooms">
           <router-link class="nav-link" v-bind:to="'/room/' + room.id">
             <span v-if="$route.params.id == room.id || $route.name == room.id" class="font-weight-bold">{{room.name}}</span>
+            <span v-else-if="highlights[room.id]" class="text-warning">{{room.name}}</span>
             <span v-else>{{room.name}}</span>
           </router-link>
         </li>

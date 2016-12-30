@@ -39,6 +39,7 @@ const Room = {
   `,
   methods: {
     fetchData() {
+      this.$set(state.highlights, this.roomName, false);
       socket.emit('user join room', this.roomName);
       let self = this;
       if (state.onInitialLoad) {

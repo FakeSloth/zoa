@@ -54,6 +54,12 @@ socket.on('add room log', (data) => {
         });
       });
   }
+
+  const route = GLOBAL_ROUTER.currentRoute;
+  const currentRoom = route.params.id || route.name;
+  if (currentRoom !== data.room) {
+    Vue.set(state.highlights, data.room, true);
+  }
 });
 
 socket.on('finish add auth user', () => {
