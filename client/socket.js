@@ -33,6 +33,7 @@ socket.on('load rooms', (rooms) => {
 });
 
 socket.on('load room', (room) => {
+  if (state.rooms[room.id]) return;
   Vue.set(state.rooms, room.id, room);
 });
 
