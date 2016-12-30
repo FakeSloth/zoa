@@ -50,7 +50,7 @@ const MessageList = {
 };
 
 const Chat = {
-  props: ['messageList'],
+  props: ['messageList', 'username'],
   data() {
     return {
       message: '',
@@ -64,16 +64,22 @@ const Chat = {
   template: `
     <div class="col-sm-10">
       <MessageList v-bind:messages="messageList" />
-      <textarea
-        rows="1"
-        autocomplete="off"
-        class="form-control textbox"
-        v-model="message"
-        v-on:keyup.shift.enter="shifting"
-        v-on:keyup.enter="createMessage"
-        v-on:keyup.up="pastMessage(1)"
-        v-on:keyup.down="pastMessage(-1)"
-      />
+      <div v-if="username">
+        <textarea
+          rows="1"
+          autocomplete="off"
+          class="form-control textbox"
+          v-model="message"
+          v-on:keyup.shift.enter="shifting"
+          v-on:keyup.enter="createMessage"
+          v-on:keyup.up="pastMessage(1)"
+          v-on:keyup.down="pastMessage(-1)"
+        />
+      </div>
+      <div v-else>
+        <hr />
+        <router-link to="/choose-name">Join chat</router-link>
+      </div>
     </div>
   `,
   methods: {

@@ -62,7 +62,7 @@ new Vue({
         </li>
       </ul>
     </nav>
-    <router-view v-bind:rooms="rooms" v-bind:allRooms="allRooms"></router-view>
+    <router-view v-bind:rooms="rooms" v-bind:allRooms="allRooms" v-bind:username="username"></router-view>
   </div>
   `,
   methods: {

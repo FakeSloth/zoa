@@ -20,7 +20,7 @@ const UserList = {
 };
 
 const Room = {
-  props: ['rooms'],
+  props: ['rooms', 'username'],
   components: {
     UserList,
     Chat
@@ -34,7 +34,7 @@ const Room = {
   template: `
     <div>
       <UserList v-bind:users="room.users" />
-      <Chat v-bind:messageList="room.log" />
+      <Chat v-bind:messageList="room.log" v-bind:username="username" />
     </div>
   `,
   methods: {
