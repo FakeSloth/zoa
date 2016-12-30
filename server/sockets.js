@@ -122,7 +122,9 @@ function sockets(io/*: Object */) {
         Rooms.removeUser(socket.userId, socket);
         Users.remove(socket.userId);
         db.auths.remove(socket.userId);
-        io.emit('load rooms', Rooms.list());
+        for (let roomId in socket.activeRooms) {
+          io.emit('load room userlist', {id: roomId, users: Rooms.get(roomId).data().users});
+        }
       }
     });
   });

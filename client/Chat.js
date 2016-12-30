@@ -26,7 +26,8 @@ const Message = {
   `,
   methods: {
     fromNow() {
-      this.title = ms(Date.now() - this.message.date, { long: true }) + ' ago';
+      const diff = Date.now() - this.message.date;
+      this.title = ms(diff || 0, { long: true }) + ' ago';
     }
   }
 };
