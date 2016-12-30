@@ -50,9 +50,10 @@ socket.on('add room log', (data) => {
   const isNotOnPage = document.hidden;
   if (hasNotif && isNotOnPage) {
       Notification.requestPermission(() => {
-        new Notification(`New message in ${data.room} - zoa`, {
+        let notif = new Notification(`New message in ${data.room} - zoa`, {
           body: `${data.username}: ${data.originalText}`
         });
+        setTimeout(() => notif.close(), 5000);
       });
   }
 
