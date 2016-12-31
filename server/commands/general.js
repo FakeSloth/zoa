@@ -64,6 +64,39 @@ let commands = {
       .fold(e => e,
             () => successLeave);
   },
+
+  sticky: 'addsticky',
+  addsticky(target, room, user) {
+    const errSticky = {text: 'This room already has a sticky post.'};
+
+    const successAddSticky = {
+      sideEffect(io, socket) {
+        room.hasSticky = true;
+        io.to(room.id).emit('set room sticky', {room: room.id, sticky: {text: target}});
+      }
+    };
+
+    return fromErr(!room.hasSticky, errSticky)
+      .fold(e => e,
+            () => successAddSticky);
+  },
+
+  unsticky: 'removesticky',
+  removesticky(target, room, user) {
+    const errNoSticky = {text: 'This room is doesn\'t have a sticky post.'};
+
+    const successRemoveSticky = {
+      text: 'Sticky post has been removed.',
+      sideEffect(io, socket) {
+        room.hasSticky = false;
+        io.to(room.id).emit('set room sticky', {room: room.id});
+      }
+    };
+
+    return fromErr(room.hasSticky, errNoSticky)
+      .fold(e => e,
+            () => successRemoveSticky);
+  }
 };
 
 module.exports = commands;

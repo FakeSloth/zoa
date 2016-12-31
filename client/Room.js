@@ -34,7 +34,12 @@ const Room = {
   template: `
     <div>
       <UserList v-bind:users="room.users" />
-      <Chat v-bind:messageList="room.log" v-bind:username="username" />
+      <Chat
+        v-bind:messageList="room.log"
+        v-bind:username="username"
+        v-bind:hasSticky="room.hasSticky"
+        v-bind:sticky="room.sticky"
+      />
     </div>
   `,
   methods: {
@@ -55,7 +60,7 @@ const Room = {
       return this.$route.params.id || this.$route.name;
     },
     room() {
-      const defaultRoom = {name: this.roomName, id: toId(this.roomName), users: [], log: []};
+      const defaultRoom = {name: this.roomName, id: toId(this.roomName), users: [], log: [], hasSticky: false, sticky: {}};
       return this.rooms[this.roomName] || defaultRoom;
     }
   }

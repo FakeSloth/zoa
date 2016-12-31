@@ -10,6 +10,8 @@ class Room {
   id: string;
   users: Array<string>;
   log: Array<Object>;
+  hasSticky: bool;
+  sticky: Object;
 
   */
 
@@ -18,6 +20,8 @@ class Room {
     this.id = toId(name);
     this.users = [];
     this.log = [];
+    this.hasSticky = false;
+    this.sticky = {};
   }
 
   setName(name/*: string */) {
@@ -65,7 +69,9 @@ class Room {
       id: this.id,
       name: this.name,
       users: this.users.map(name => ({name, hashColor: hashColor(name)})),
-      log: this.log
+      log: this.log,
+      hasSticky: this.hasSticky,
+      sticky: this.sticky
     };
   }
 

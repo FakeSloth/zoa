@@ -86,4 +86,13 @@ socket.on('user leave room', (roomName) => {
   }
 });
 
+socket.on('set room sticky', (data) => {
+  if (data.sticky) {
+    Vue.set(state.rooms[data.room], 'hasSticky', true);
+    Vue.set(state.rooms[data.room], 'sticky', data.sticky.text);
+  } else {
+    Vue.set(state.rooms[data.room], 'hasSticky', false);
+  }
+});
+
 module.exports = socket;

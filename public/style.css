@@ -4,7 +4,6 @@
 }
 
 .message-list {
-  height:85vh;
   overflow-y: auto;
   word-wrap: break-word;
 }

@@ -49,8 +49,17 @@ const MessageList = {
   }
 };
 
+const Sticky = {
+  props: ['hasSticky', 'sticky'],
+  template: `
+    <div v-if="hasSticky" class="jumbotron" >
+      <h1>{{sticky}}</h1>
+    </div>
+  `
+};
+
 const Chat = {
-  props: ['messageList', 'username'],
+  props: ['messageList', 'username', 'hasSticky', 'sticky'],
   data() {
     return {
       message: '',
@@ -59,11 +68,13 @@ const Chat = {
     };
   },
   components: {
-    MessageList
+    MessageList,
+    Sticky
   },
   template: `
     <div class="col-sm-10">
-      <MessageList v-bind:messages="messageList" />
+      <Sticky v-bind:hasSticky="hasSticky" v-bind:sticky="sticky" />
+      <MessageList v-bind:messages="messageList" v-bind:style="{ height: listHeight }" />
       <div v-if="username">
         <textarea
           rows="1"
@@ -113,6 +124,11 @@ const Chat = {
       if (!message) return;
       this.message = message.originalText;
       this.negativeIndex += num;
+    }
+  },
+  computed: {
+    listHeight() {
+      return this.hasSticky ? '60vh' : '85vh';
     }
   }
 };
