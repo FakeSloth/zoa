@@ -1,6 +1,5 @@
 // @flow
 
-const toId = require('toid');
 const hashColor = require('./hashColor');
 
 class Room {
