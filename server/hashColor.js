@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const toId = require('toid');
 
 let colorCache = {};
 

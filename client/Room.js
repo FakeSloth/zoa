@@ -3,7 +3,6 @@
 import Chat from './Chat';
 import socket from './socket';
 import state from './state';
-import toId from 'toid';
 
 const UserList = {
   props: ['users'],

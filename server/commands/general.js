@@ -3,7 +3,6 @@
 const Rooms = require('../rooms');
 const config = require('../config');
 const {fromErr} = require('../fp');
-const toId = require('toid');
 
 let commands = {
   hello(target) {

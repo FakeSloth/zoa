@@ -3,7 +3,6 @@
 const _ = require('lodash');
 const config = require('./config');
 const db = require('./db');
-const toId = require('toid');
 const Users = require('./users');
 const Rooms = require('./rooms');
 const hashColor = require('./hashColor');
