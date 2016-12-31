@@ -9,7 +9,6 @@ const http/*: any*/ = require('http');
 const path = require('path');
 const socketio = require('socket.io');
 const sockets = require('./sockets');
-const toId = require('toid');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config');
 const webpackDev = require('webpack-dev-middleware');
