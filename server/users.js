@@ -1,7 +1,6 @@
 // @flow
 
 const db = require('./db');
-const toId = require('toid');
 
 /* flow-include
 
