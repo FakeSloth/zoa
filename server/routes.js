@@ -6,7 +6,6 @@ const db = require('./db');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const toId = require('toid');
 const Users = require('./users');
 
 const router = express.Router();
