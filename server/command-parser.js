@@ -10,6 +10,8 @@ const MESSAGE_COOLDOWN = 400;
 const SAME_MESSAGE_COOLDOWN = 5 * 60 * 1000;
 const VALID_COMMAND_TOKENS = '/';
 
+global.toId = require('toid');
+
 function loadCommands() {
   let cmds = {};
   for (let file of fs.readdirSync(path.resolve(__dirname, 'commands'))) {
