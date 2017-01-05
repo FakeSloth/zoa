@@ -1,12 +1,5 @@
 const {Map} = require('immutable');
-const {compose} = require('ramda');
-const {lens, view, set} = require('ramda-lens');
 const toId = require('toid');
-
-const immLens = key => lens((x) => x.get(key), (val, x) => x.set(key, val));
-
-// lense
-const user = id => immLens(id);
 
 function getIP(socket /*: Socket */) /*: string */ {
   const forwarded = socket.request.headers['x-forwarded-for'];
@@ -28,16 +21,15 @@ function createUser(users, name, socket, authenticated) {
     lastMessage: '',
     lastMessageTime: 0
   });
-  return set(user(userId), User, users);
+  return users.set(userId, User);
 }
 
 function getUser(users, name) {
-  return view(compose(user, toId)(name), users);
+  return users.get(toId(name));
 }
 
 function removeUser(users, name) {
-  const userId = toId(name);
-  return users.delete(userId);
+  return users.delete(toId(name));
 }
 
 // actions
