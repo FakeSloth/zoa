@@ -3,6 +3,7 @@ import {Map, is} from 'immutable';
 import {
   getIP,
   createUser,
+  getUser,
   removeUser,
   CREATE_USER,
   REMOVE_USER,
@@ -12,21 +13,27 @@ import store from '../server/redux/store';
 
 const socket = {request: {headers: {'x-forwarded-for': '23.3434.454.65'}}};
 
-test('create user', t => {
+test('create user and get user', t => {
+  t.plan(2);
+
   const initialState = Map();
   const nextState = createUser(initialState, 'Phil', socket, true);
+  const expectedUser = Map({
+    name: 'Phil',
+    socket,
+    authenticated: true,
+    id: 'phil',
+    ip: getIP(socket),
+    lastMessage: '',
+    lastMessageTime: 0
+  });
   const expectedState = Map({
-    'phil': Map({
-      name: 'Phil',
-      socket,
-      authenticated: true,
-      id: 'phil',
-      ip: getIP(socket),
-      lastMessage: '',
-      lastMessageTime: 0
-    })
+    'phil': expectedUser
   });
   t.truthy(is(nextState, expectedState));
+
+  const user = getUser(nextState, 'Phil');
+  t.truthy(is(user, expectedUser));
 });
 
 test('remove user', t => {
