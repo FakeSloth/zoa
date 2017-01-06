@@ -89,7 +89,7 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
   }
   user.lastMessage = normalized;
 
-  return {text: markup(normalized), originalText: normalized};
+  return {text: markup(normalized), originalText: normalized, date: Date.now()};
 };
 
 function markup(message) {

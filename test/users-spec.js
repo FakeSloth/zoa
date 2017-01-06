@@ -122,7 +122,7 @@ test('CREATE_USER with store', t => {
   const initialState = {
     users: Map()
   };
-  t.deepEqual(store.getState(), initialState);
+  t.truthy(is(store.getState().users, initialState.users));
 
   const action = {type: CREATE_USER, name: 'Phil', socket, authenticated: true};
   store.dispatch(action);
