@@ -1,5 +1,6 @@
 // @flow weak
 
+const Sockets = require('./sockets');
 const bodyParser = require('body-parser');
 const compress = require('compression');
 const config = require('./config');
@@ -8,7 +9,6 @@ const express = require('express');
 const http/*: any*/ = require('http');
 const path = require('path');
 const socketio = require('socket.io');
-const sockets = require('./sockets');
 const toId = require('toid');
 const webpack = require('webpack');
 const webpackConfig = require('../webpack.config');
@@ -55,7 +55,7 @@ app.use('/', routes);
 
 db.auths.keys().forEach(name => db.auths.remove(name));
 
-sockets(io);
+new Sockets(io);
 
 server.listen(config.port, (err) => {
   if (err) console.log(err);

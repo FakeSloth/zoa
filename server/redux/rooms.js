@@ -13,8 +13,8 @@ function createRoom(rooms, name) {
   return rooms.set(roomId, Room);
 }
 
-function getRoom(rooms, name) {
-  return rooms.get(toId(name));
+function getRoom(store, name) {
+  return store.getState().rooms.get(toId(name));
 }
 
 function userList(users) {
@@ -23,18 +23,18 @@ function userList(users) {
 
 function getRoomData(store, roomId) {
   const room = store.getState().rooms.get(roomId);
-  return room.update('users', userList);
+  return room.update('users', userList).toJS();
 }
 
 function listActiveRooms(store, activeRooms) {
-  return fromJS(activeRooms)
-    .mapKeys(roomId => getRoomData(store, roomId))
+  return activeRooms
+    .map((_, roomId) => getRoomData(store, roomId))
     .toJS();
 }
 
 function listAllRooms(store) {
   const rooms = store.getState().rooms;
-  return rooms.mapKeys(roomId => Map({
+  return rooms.map((_, roomId) => Map({
     id: rooms.getIn([roomId, 'id']),
     name: rooms.getIn([roomId, 'name']),
     userCount: rooms.getIn([roomId, 'users']).size
@@ -45,9 +45,14 @@ function addUserToRoom(rooms, roomId, userName) {
   return rooms.updateIn([roomId, 'users'], users => users.push(userName));
 }
 
+const filtered = userId => users => users.filter(name => toId(name) !== userId);
+
 function removeUserFromRoom(rooms, roomId, userId) {
-  const filtered = users => users.filter(name => toId(name) !== userId);
-  return rooms.updateIn([roomId, 'users'], filtered);
+  return rooms.updateIn([roomId, 'users'], filtered(userId));
+}
+
+function removeUserFromAllRooms(rooms, userId) {
+  return rooms.map(room => room.update('users', filtered(userId)));
 }
 
 function addRawMessage(rooms, roomId, message) {
@@ -75,6 +80,7 @@ function getLastMessage(store, roomId) {
 const CREATE_ROOM = 'CREATE_ROOM';
 const ADD_USER_TO_ROOM = 'ADD_USER_TO_ROOM';
 const REMOVE_USER_FROM_ROOM = 'REMOVE_USER_FROM_ROOM';
+const REMOVE_USER_FROM_ALL_ROOMS = 'REMOVE_USER_FROM_ALL_ROOMS';
 const ADD_RAW_MESSAGE = 'ADD_RAW_MESSAGE';
 const ADD_USER_MESSAGE = 'ADD_USER_MESSAGE';
 
@@ -88,6 +94,8 @@ function reducer(state = defaultState, action) {
     return addUserToRoom(state, action.roomId, action.userName);
   case REMOVE_USER_FROM_ROOM:
     return removeUserFromRoom(state, action.roomId, action.userId);
+  case REMOVE_USER_FROM_ALL_ROOMS:
+    return removeUserFromAllRooms(state, action.userId);
   case ADD_RAW_MESSAGE:
     return addRawMessage(state, action.roomId, action.message);
   case ADD_USER_MESSAGE:
@@ -112,6 +120,7 @@ module.exports = {
   CREATE_ROOM,
   ADD_USER_TO_ROOM,
   REMOVE_USER_FROM_ROOM,
+  REMOVE_USER_FROM_ALL_ROOMS,
   ADD_RAW_MESSAGE,
   ADD_USER_MESSAGE,
 
