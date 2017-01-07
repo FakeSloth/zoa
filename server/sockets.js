@@ -1,14 +1,29 @@
-// @flow
 
 const _ = require('lodash');
 const config = require('./config');
 const db = require('./db');
 const toId = require('toid');
-const Users = require('./users');
-const Rooms = require('./rooms');
 const hashColor = require('./hashColor');
 const messageSchema = require('../schemas/message');
 const CommandParser = require('./command-parser');
+const {
+  getRoom,
+  getRoomData,
+  listActiveRooms,
+  listAllRooms,
+  getLastMessage,
+  CREATE_ROOM,
+  ADD_USER_TO_ROOM,
+  REMOVE_USER_FROM_ROOM,
+  ADD_RAW_MESSAGE,
+  ADD_USER_MESSAGE
+} = require('./redux/rooms');
+const {
+  getUser,
+  CREATE_USER,
+  REMOVE_USER
+} = require('./redux/users');
+const store = require('./redux/store');
 
 function sockets(io/*: Object */) {
   io.on('connection', function(socket) {
@@ -16,22 +31,22 @@ function sockets(io/*: Object */) {
 
     socket.activeRooms = {'lobby': 1};
 
-    socket.emit('load rooms', Rooms.list(socket.activeRooms));
-    socket.emit('load all rooms', Rooms.listAll());
+    socket.emit('load rooms', listActiveRooms(store, socket.activeRooms));
+    socket.emit('load all rooms', listAllRooms(store));
 
     socket.on('add choose name user', (username) => {
       if (!_.isString(username)) return socket.emit('err', 'Must be a string.');
       if (username.length > 21) return socket.emit('err', 'Username must be less than 21 characters.');
-      if (Users.get(username)) return socket.emit('err', 'Someone is already using that username.');
-      if (Users.isRegistered(username)) return socket.emit('err', 'This username is registered.');
+      if (getUser(store, username)) return socket.emit('err', 'Someone is already using that username.');
+      if (db.users.get(toId(username))) return socket.emit('err', 'This username is registered.');
       if (!socket.userId) {
-        Users.create(username, socket, false);
+        store.dispatch({type: CREATE_USER, name: username, socket, authenticated: false});
       } else if (Users.get(socket.userId) && Users.get(socket.userId).authenticated) {
         return socket.emit('err', 'You must logout to change from an auth username to an unauth one.');
       } else {
-        Users.remove(socket.userId);
+        store.dispatch({type: REMOVE_USER, name: socket.userId});
         db.auths.remove(socket.userId);
-        Users.create(username, socket, false);
+        store.dispatch({type: CREATE_USER, name: username, socket, authenticated: false});
       }
       socket.emit('hash color', hashColor(socket.userId));
       socket.emit('chooseName success', username);
@@ -40,10 +55,10 @@ function sockets(io/*: Object */) {
     socket.on('add auth user', (username) => {
       if (!_.isString(username)) return socket.emit('err', 'Must be a string.');
       if (toId(username).length > 21) return socket.emit('err', 'Username must be less than 21 characters.');
-      if (Users.get(username)) return socket.emit('err', 'Someone is already using that username.');
+      if (getUser(store, username)) return socket.emit('err', 'Someone is already using that username.');
       if (!db.auths.get(toId(username))) return socket.emit('err', 'This username has not been authenticated.');
       //if (Users.get(socket.userId) && Users.get(socket.userId).registered) return socket.emit('err', 'You cannot add yourself when already auth.');
-      Users.create(username, socket, true);
+      store.dispatch({type: CREATE_USER, name: username, socket, authenticated: true});
       socket.emit('hash color', hashColor(socket.userId));
       socket.emit('chooseName success', username);
       socket.emit('finish add auth user');
@@ -51,11 +66,14 @@ function sockets(io/*: Object */) {
 
     socket.on('remove user', () => {
       if (socket.userId) {
-        Users.remove(socket.userId);
+        store.dispatch({type: REMOVE_USER, name: socket.userId});
         db.auths.remove(socket.userId);
-        Rooms.removeUser(socket.userId, socket);
-        io.emit('load rooms', Rooms.list());
-        io.emit('load all rooms', Rooms.listAll());
+        // this below is temp
+        store.getState().rooms.mapKeys(roomId => {
+          store.dispatch({type: REMOVE_USER_FROM_ROOM, userId: socket.userId, roomId});
+        });
+        io.emit('load rooms', store.getState().rooms.toJS());
+        io.emit('load all rooms', listAllRooms(store));
       }
     });
 

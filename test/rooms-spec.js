@@ -18,7 +18,7 @@ import {
   ADD_USER_MESSAGE,
   rooms
 } from '../server/redux/rooms';
-import store from '../server/redux/store';
+import {createStore} from 'redux';
 
 const expectedRoomState = Map({
   'lobby': Map({
@@ -132,42 +132,50 @@ test('add user message', t => {
 
 test('get all room data', t => {
   const date = Date.now();
-  const state = Map({
-    'lobby': Map({
-      name: 'Lobby',
-      id: 'lobby',
-      users: List(['Phil', 'Jack', 'Sacha', 'Jared']),
-      log: List([
-        Map({
-          raw: true,
-          private: true,
-          date,
-          text: 'Hello World!',
-          room: 'lobby'
-        }),
-        Map({
-          username: 'Phil',
-          date,
-          text: 'Hello World!',
-          originalText: 'Hello World!',
-          room: 'lobby',
-          hashColor: '#BE7823'
-        })
-      ])
-    }),
-    'staff': Map({
-      name: 'Staff',
-      id: 'staff',
-      users: List(['Phil']),
-      log: List()
+  const defaultState = {
+    rooms: Map({
+      'lobby': Map({
+        name: 'Lobby',
+        id: 'lobby',
+        users: List(['Phil', 'Jack', 'Sacha', 'Jared']),
+        log: List([
+          Map({
+            raw: true,
+            private: true,
+            date,
+            text: 'Hello World!',
+            room: 'lobby'
+          }),
+          Map({
+            username: 'Phil',
+            date,
+            text: 'Hello World!',
+            originalText: 'Hello World!',
+            room: 'lobby',
+            hashColor: '#BE7823'
+          })
+        ])
+      }),
+      'staff': Map({
+        name: 'Staff',
+        id: 'staff',
+        users: List(['Phil']),
+        log: List()
+      })
     })
-  });
+  };
 
-  listActiveRooms(state, {'lobby': 1, 'staff': 1});
-  listAllRooms(state);
-  getLastMessage(state, 'lobby');
+  function reducer(state = defaultState) {
+    return state;
+  }
 
-  t.truthy(is(getRoomData(state, 'staff'), Map({
+  const store = createStore(reducer);
+
+  listActiveRooms(store, {'lobby': 1, 'staff': 1});
+  listAllRooms(store);
+  getLastMessage(store, 'lobby');
+
+  t.truthy(is(getRoomData(store, 'staff'), Map({
     name: 'Staff',
     id: 'staff',
     log: List(),

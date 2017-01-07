@@ -21,18 +21,19 @@ function userList(users) {
   return users.map(name => Map({name, hashColor: hashColor(name)}));
 }
 
-function getRoomData(rooms, roomId) {
-  const room = rooms.get(roomId);
+function getRoomData(store, roomId) {
+  const room = store.getState().rooms.get(roomId);
   return room.update('users', userList);
 }
 
-function listActiveRooms(rooms, activeRooms) {
+function listActiveRooms(store, activeRooms) {
   return fromJS(activeRooms)
-    .mapKeys(roomId => getRoomData(rooms, roomId))
+    .mapKeys(roomId => getRoomData(store, roomId))
     .toJS();
 }
 
-function listAllRooms(rooms) {
+function listAllRooms(store) {
+  const rooms = store.getState().rooms;
   return rooms.mapKeys(roomId => Map({
     id: rooms.getIn([roomId, 'id']),
     name: rooms.getIn([roomId, 'name']),
@@ -66,8 +67,8 @@ function addUserMessage(rooms, roomId, userMessage) {
   return addRawMessage(rooms, roomId, message);
 }
 
-function getLastMessage(rooms, roomId) {
-  return rooms.getIn([roomId, 'log']).last().toJS();
+function getLastMessage(store, roomId) {
+  return store.getState().rooms.getIn([roomId, 'log']).last().toJS();
 }
 
 // actions

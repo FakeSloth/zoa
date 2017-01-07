@@ -24,8 +24,8 @@ function createUser(users, name, socket, authenticated) {
   return users.set(userId, User);
 }
 
-function getUser(users, name) {
-  return users.get(toId(name));
+function getUser(store, name) {
+  return store.getState().users.get(toId(name));
 }
 
 function removeUser(users, name) {

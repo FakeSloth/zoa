@@ -10,6 +10,7 @@ import {
   users
 } from '../server/redux/users';
 import store from '../server/redux/store';
+import {createStore} from 'redux';
 
 const socket = {request: {headers: {'x-forwarded-for': '23.3434.454.65'}}};
 
@@ -49,10 +50,20 @@ test('get User', t => {
     'phil': expectedUser
   });
 
-  const user = getUser(nextState, 'Phil');
+  const defaultState = {
+    users: expectedState
+  };
+
+  function reducer(state = defaultState) {
+    return state;
+  }
+
+  const userStore = createStore(reducer);
+
+  const user = getUser(userStore, 'Phil');
   t.truthy(is(user, expectedUser));
 
-  const unknownUser = getUser(nextState, 'asdas');
+  const unknownUser = getUser(userStore, 'asdas');
   t.falsy(unknownUser);
 });
 
