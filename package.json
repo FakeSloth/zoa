@@ -23,8 +23,6 @@
     "nef": "^1.1.0",
     "nef-fs": "^1.0.0",
     "nef-mongo": "^1.0.1",
-    "ramda": "^0.23.0",
-    "ramda-lens": "^0.1.1",
     "redux": "^3.6.0",
     "schemapack": "^1.4.2",
     "socket.io": "^1.7.2",

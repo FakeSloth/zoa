@@ -1,8 +1,10 @@
+// @flow
+
 const {Map, List, fromJS} = require('immutable');
 const hashColor = require('../hashColor');
 const toId = require('toid');
 
-function createRoom(rooms, name) {
+function createRoom(rooms, name/*: string */) {
   const roomId = toId(name);
   const Room = Map({
     name,
@@ -13,49 +15,21 @@ function createRoom(rooms, name) {
   return rooms.set(roomId, Room);
 }
 
-function getRoom(store, name) {
-  return store.getState().rooms.get(toId(name));
-}
-
-function userList(users) {
-  return users.map(name => Map({name, hashColor: hashColor(name)}));
-}
-
-function getRoomData(store, roomId) {
-  const room = store.getState().rooms.get(roomId);
-  return room.update('users', userList).toJS();
-}
-
-function listActiveRooms(store, activeRooms) {
-  return activeRooms
-    .map((_, roomId) => getRoomData(store, roomId))
-    .toJS();
-}
-
-function listAllRooms(store) {
-  const rooms = store.getState().rooms;
-  return rooms.map((_, roomId) => Map({
-    id: rooms.getIn([roomId, 'id']),
-    name: rooms.getIn([roomId, 'name']),
-    userCount: rooms.getIn([roomId, 'users']).size
-  })).toList().toJS();
-}
-
-function addUserToRoom(rooms, roomId, userName) {
+function addUserToRoom(rooms, roomId/*: string */, userName/*: string */) {
   return rooms.updateIn([roomId, 'users'], users => users.push(userName));
 }
 
 const filtered = userId => users => users.filter(name => toId(name) !== userId);
 
-function removeUserFromRoom(rooms, roomId, userId) {
+function removeUserFromRoom(rooms, roomId/*: string */, userId/*: string */) {
   return rooms.updateIn([roomId, 'users'], filtered(userId));
 }
 
-function removeUserFromAllRooms(rooms, userId) {
+function removeUserFromAllRooms(rooms, userId/*: string */) {
   return rooms.map(room => room.update('users', filtered(userId)));
 }
 
-function addRawMessage(rooms, roomId, message) {
+function addMessage(rooms, roomId/*: string */, message/*: Object */) {
   let addMessage;
   if (rooms.getIn([roomId, 'log']).size >= 100) {
     addMessage = log => log.shift().push(fromJS(message));
@@ -65,28 +39,16 @@ function addRawMessage(rooms, roomId, message) {
   return rooms.updateIn([roomId, 'log'], addMessage);
 }
 
-function addUserMessage(rooms, roomId, userMessage) {
-  const message = fromJS(userMessage)
-    .set('hashColor', hashColor(toId(userMessage.username)))
-    .toJS();
-  return addRawMessage(rooms, roomId, message);
-}
-
-function getLastMessage(store, roomId) {
-  return store.getState().rooms.getIn([roomId, 'log']).last().toJS();
-}
-
 // actions
 const CREATE_ROOM = 'CREATE_ROOM';
 const ADD_USER_TO_ROOM = 'ADD_USER_TO_ROOM';
 const REMOVE_USER_FROM_ROOM = 'REMOVE_USER_FROM_ROOM';
 const REMOVE_USER_FROM_ALL_ROOMS = 'REMOVE_USER_FROM_ALL_ROOMS';
-const ADD_RAW_MESSAGE = 'ADD_RAW_MESSAGE';
-const ADD_USER_MESSAGE = 'ADD_USER_MESSAGE';
+const ADD_MESSAGE = 'ADD_MESSAGE';
 
 const defaultState = Map();
 
-function reducer(state = defaultState, action) {
+function reducer(state = defaultState, action/*: Object */) {
   switch (action.type) {
   case CREATE_ROOM:
     return createRoom(state, action.name);
@@ -96,10 +58,8 @@ function reducer(state = defaultState, action) {
     return removeUserFromRoom(state, action.roomId, action.userId);
   case REMOVE_USER_FROM_ALL_ROOMS:
     return removeUserFromAllRooms(state, action.userId);
-  case ADD_RAW_MESSAGE:
-    return addRawMessage(state, action.roomId, action.message);
-  case ADD_USER_MESSAGE:
-    return addUserMessage(state, action.roomId, action.message);
+  case ADD_MESSAGE:
+    return addMessage(state, action.roomId, action.message);
   default:
     return state;
   }
@@ -107,22 +67,15 @@ function reducer(state = defaultState, action) {
 
 module.exports = {
   createRoom,
-  getRoom,
-  getRoomData,
-  listActiveRooms,
-  listAllRooms,
   addUserToRoom,
   removeUserFromRoom,
-  addRawMessage,
-  addUserMessage,
-  getLastMessage,
+  addMessage,
 
   CREATE_ROOM,
   ADD_USER_TO_ROOM,
   REMOVE_USER_FROM_ROOM,
   REMOVE_USER_FROM_ALL_ROOMS,
-  ADD_RAW_MESSAGE,
-  ADD_USER_MESSAGE,
+  ADD_MESSAGE,
 
   rooms: reducer
 };

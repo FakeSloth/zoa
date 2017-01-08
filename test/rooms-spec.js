@@ -2,23 +2,21 @@ import test from 'ava';
 import {Map, List, is, fromJS} from 'immutable';
 import {
   createRoom,
-  getRoom,
-  getRoomData,
-  listActiveRooms,
-  listAllRooms,
   addUserToRoom,
   removeUserFromRoom,
-  addRawMessage,
-  addUserMessage,
-  getLastMessage,
+  addMessage,
   CREATE_ROOM,
   ADD_USER_TO_ROOM,
   REMOVE_USER_FROM_ROOM,
-  ADD_RAW_MESSAGE,
-  ADD_USER_MESSAGE,
+  ADD_MESSAGE,
   rooms
 } from '../server/redux/rooms';
-import {createStore} from 'redux';
+import {
+  getRoom,
+  getRoomData,
+  listActiveRooms,
+  listAllRooms
+} from '../server/getters';
 
 const expectedRoomState = Map({
   'lobby': Map({
@@ -43,8 +41,15 @@ test('create room', t => {
 
 test('get room', t => {
   t.plan(2);
-  t.truthy(is(getRoom(expectedRoomState, 'lobby'), expectedRoomState.get('lobby')));
-  t.falsy(getRoom(expectedRoomState, 'staff'));
+  const store = {
+    getState() {
+      return {
+        rooms: expectedRoomState
+      };
+    }
+  };
+  t.truthy(is(getRoom(store, 'lobby'), expectedRoomState.get('lobby')));
+  t.falsy(getRoom(store, 'staff'));
 });
 
 test('add user to room', t => {
@@ -95,10 +100,10 @@ test('add raw message', t => {
     text: 'Hello World!',
     room: 'lobby'
   };
-  const nextState = addRawMessage(expectedRoomState, 'lobby', message);
+  const nextState = addMessage(expectedRoomState, 'lobby', message);
   t.truthy(is(fromJS(message), nextState.getIn(['lobby', 'log']).first()));
 
-  const action = {type: ADD_RAW_MESSAGE, roomId: 'lobby', message};
+  const action = {type: ADD_MESSAGE, roomId: 'lobby', message};
   const nextState2 = rooms(expectedRoomState, action);
   t.truthy(is(fromJS(message), nextState2.getIn(['lobby', 'log']).first()));
 });
@@ -112,9 +117,10 @@ test('add user message', t => {
     date,
     text: 'Hello World!',
     originalText: 'Hello World!',
-    room: 'lobby'
+    room: 'lobby',
+    hashColor: '#BE7823'
   };
-  const nextState = addUserMessage(expectedRoomState, 'lobby', message);
+  const nextState = addMessage(expectedRoomState, 'lobby', message);
   const expectedMessage = Map({
     username: 'Phil',
     date,
@@ -125,7 +131,7 @@ test('add user message', t => {
   });
   t.truthy(is(expectedMessage, nextState.getIn(['lobby', 'log']).first()));
 
-  const action = {type: ADD_USER_MESSAGE, roomId: 'lobby', message};
+  const action = {type: ADD_MESSAGE, roomId: 'lobby', message};
   const nextState2 = rooms(expectedRoomState, action);
   t.truthy(is(fromJS(expectedMessage), nextState2.getIn(['lobby', 'log']).first()));
 });
@@ -165,20 +171,12 @@ test('get all room data', t => {
     })
   };
 
-  function reducer(state = defaultState) {
-    return state;
-  }
+  const store = {
+    getState() {
+      return defaultState;
+    }
+  };
 
-  const store = createStore(reducer);
-
-  listActiveRooms(store, {'lobby': 1, 'staff': 1});
+  listActiveRooms(store, Map({'lobby': true, 'staff': true}));
   listAllRooms(store);
-  getLastMessage(store, 'lobby');
-
-  t.truthy(is(getRoomData(store, 'staff'), Map({
-    name: 'Staff',
-    id: 'staff',
-    log: List(),
-    users: List([Map({name: 'Phil', hashColor: '#BE7823'})])
-  })));
 });

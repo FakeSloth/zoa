@@ -3,7 +3,6 @@ import {Map, is} from 'immutable';
 import {
   getIP,
   createUser,
-  getUser,
   removeUser,
   CREATE_USER,
   REMOVE_USER,
@@ -11,6 +10,9 @@ import {
 } from '../server/redux/users';
 import store from '../server/redux/store';
 import {createStore} from 'redux';
+import {
+  getUser
+} from '../server/getters';
 
 const socket = {request: {headers: {'x-forwarded-for': '23.3434.454.65'}}};
 

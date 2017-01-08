@@ -1,3 +1,5 @@
+// @flow
+
 const {Map} = require('immutable');
 const toId = require('toid');
 
@@ -10,7 +12,7 @@ function getIP(socket /*: Socket */) /*: string */ {
   }
 }
 
-function createUser(users, name, socket, authenticated) {
+function createUser(users, name/*: string */, socket/*: Object */, authenticated/*: bool */) {
   const userId = toId(name);
   const User = Map({
     name,
@@ -24,26 +26,28 @@ function createUser(users, name, socket, authenticated) {
   return users.set(userId, User);
 }
 
-function getUser(store, name) {
-  return store.getState().users.get(toId(name));
-}
-
-function removeUser(users, name) {
+function removeUser(users, name/*: string */) {
   return users.delete(toId(name));
 }
 
 // actions
 const CREATE_USER = 'CREATE_USER';
 const REMOVE_USER = 'REMOVE_USER';
+const SET_LAST_MESSAGE = 'SET_LAST_MESSAGE';
+const SET_LAST_MESSAGE_TIME = 'SET_LAST_MESSAGE_TIME';
 
 const defaultState = Map();
 
-function reducer(state = defaultState, action) {
+function reducer(state = defaultState, action/*: Object */) {
   switch (action.type) {
   case CREATE_USER:
     return createUser(state, action.name, action.socket, action.authenticated);
   case REMOVE_USER:
     return removeUser(state, action.name);
+  case SET_LAST_MESSAGE:
+    return state.setIn([action.userId, 'lastMessage'], action.message);
+  case SET_LAST_MESSAGE_TIME:
+    return state.setIn([action.userId, 'lastMessageTime'], action.date);
   default:
     return state;
   }
@@ -52,11 +56,12 @@ function reducer(state = defaultState, action) {
 module.exports = {
   getIP,
   createUser,
-  getUser,
   removeUser,
 
   CREATE_USER,
   REMOVE_USER,
+  SET_LAST_MESSAGE,
+  SET_LAST_MESSAGE_TIME,
 
   users: reducer
 };
