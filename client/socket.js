@@ -28,7 +28,7 @@ socket.on('load all rooms', (allRooms) => {
   state.allRooms = allRooms;
 });
 
-socket.on('load rooms', (rooms) => {
+socket.on('load active rooms', (rooms) => {
   state.rooms = rooms;
 });
 

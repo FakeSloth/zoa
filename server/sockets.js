@@ -72,7 +72,7 @@ class Socket {
 
     socket.activeRooms = Map({'lobby': true});
 
-    socket.emit('load rooms', listActiveRooms(store, socket.activeRooms));
+    socket.emit('load active rooms', listActiveRooms(store, socket.activeRooms));
     socket.emit('load all rooms', listAllRooms(store));
   }
 
@@ -181,7 +181,7 @@ class Socket {
     db.auths.remove(userId);
     store.dispatch({type: REMOVE_USER_FROM_ALL_ROOMS, userId});
 
-    this.io.emit('load rooms', listActiveRooms(store, this.socket.activeRooms));
+    this.io.emit('load active rooms', listActiveRooms(store, this.socket.activeRooms));
     this.io.emit('load all rooms', listAllRooms(store));
   }
 
@@ -232,7 +232,7 @@ class Socket {
 
     const roomData = getRoomData(store, roomId);
 
-    this.socket.emit('load rooms', listActiveRooms(store, this.socket.activeRooms));
+    this.socket.emit('load active rooms', listActiveRooms(store, this.socket.activeRooms));
     this.io.to(roomId).emit('load room userlist', {id: roomId, users: roomData.users});
     this.io.emit('load all rooms', listAllRooms(store));
   }
