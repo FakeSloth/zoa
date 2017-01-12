@@ -215,11 +215,15 @@ class Socket {
   userLeaveRoom(roomName/*: string */) {
     const roomId = toId(roomName);
     const userId = this.socket.userId;
-    const users = getRoom(store, roomId).get('users').filter(toId);
+    const room = getRoom(store, roomId);
+
+    if (!room) return this.err(`Room ${roomId} does not exist.`);
+
+    const users = room.get('users').filter(toId);
 
     if (this.handleRoomError(roomName)) return;
     if (!users.includes(userId)) return this.err('Not in this room.');
-    if (!this.socket.activeRooms.has(roomId)) {
+    if (this.socket.activeRooms.has(roomId)) {
       this.socket.activeRooms = this.socket.activeRooms.remove(roomId);
     }
 
@@ -228,7 +232,7 @@ class Socket {
 
     const roomData = getRoomData(store, roomId);
 
-    this.socket.emit('load room', roomData);
+    this.socket.emit('load rooms', listActiveRooms(store, this.socket.activeRooms));
     this.io.to(roomId).emit('load room userlist', {id: roomId, users: roomData.users});
     this.io.emit('load all rooms', listAllRooms(store));
   }

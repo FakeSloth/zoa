@@ -4,7 +4,7 @@ const config = require('../config');
 const {fromErr} = require('../fp');
 const toId = require('toid');
 const {CREATE_ROOM, REMOVE_USER_FROM_ROOM} = require('../redux/rooms');
-const {getRoom, getRoomData, listAllRooms} = require('../getters');
+const {getRoom, getRoomData, listActiveRooms, listAllRooms} = require('../getters');
 
 function isSysop(user) {
   return config.sysop !== user.get('id') || !user.get('authenticated');
