@@ -28,7 +28,7 @@ socket.on('load all rooms', (allRooms) => {
   state.allRooms = allRooms;
 });
 
-socket.on('load rooms', (rooms) => {
+socket.on('load active rooms', (rooms) => {
   state.rooms = rooms;
 });
 
@@ -75,10 +75,7 @@ socket.on('user join room', (roomName) => {
 
 socket.on('user leave room', (roomName) => {
   socket.emit('user leave room', roomName);
-  const rooms = state.rooms;
-  delete rooms[roomName];
-  Vue.set(state, 'rooms', rooms);
-  const roomNames = Object.keys(state.rooms);
+  const roomNames = Object.keys(state.rooms).filter(name => name !== roomName);
   if (!roomNames.length) {
     GLOBAL_ROUTER.push('/room/lobby');
   } else {

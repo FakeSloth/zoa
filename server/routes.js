@@ -7,7 +7,6 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const toId = require('toid');
-const Users = require('./users');
 
 const router = express.Router();
 
@@ -24,21 +23,20 @@ router.post('/register', (req, res) => {
     return res.json({error: 'No username or password.'});
   }
   const username = req.body.username.trim();
+  const userId = toId(username);
   if (username.length > 19 || req.body.password.length > 150) {
     return res.json({error: 'Username or password is too long.'});
   }
-  if (Users.isRegistered(username)) {
+  if (db.users.get(userId)) {
     return res.json({error: 'Someone has already registered this username.'});
   }
   bcrypt.genSalt(13, (err, salt) => {
     if (err) return res.json({error: 'Salt failed.'});
     bcrypt.hash(req.body.password, salt, null, (err, hash) => {
       if (err) return res.json({error: 'Hash failed.'});
-      console.log('yo')
-      Users.register(username, hash);
+      db.users.set(userId, {username, userId, hash});
+      db.auths.set(userId, true);
       const token = jwt.sign({username}, config.jwtSecret, {expiresIn: '1d'});
-      console.log(token);
-      db.auths.set(toId(username), true);
       res.json({token});
     });
   });
@@ -53,15 +51,15 @@ router.post('/login', (req, res) => {
   if (username.length > 19 || req.body.password.length > 150) {
     return res.json({error: 'Username or password is too long.'});
   }
-  if (!Users.isRegistered(username)) {
+  if (!db.users.get(userId)) {
     return res.json({error: 'Username is not registered.'});
   }
-  const hash = Users.getHash(username);
+  const hash = db.users.get(userId).hash;
   bcrypt.compare(req.body.password, hash, (err, isMatch) => {
     if (err) return res.json({error: 'Compare failed.'});
     if (!isMatch) return res.json({error: 'Invalid password.'});
+    db.auths.set(userId, true);
     const token = jwt.sign({username}, config.jwtSecret, {expiresIn: '1d'});
-    db.auths.set(toId(username), true);
     res.json({token});
   });
 });

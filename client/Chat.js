@@ -2,7 +2,6 @@
 
 import ms from 'ms';
 import socket from './socket';
-import messageSchema from '../schemas/message';
 import state from './state';
 
 const Message = {
@@ -14,9 +13,6 @@ const Message = {
     <div v-on:mouseover="fromNow" v-bind:title="title">
       <div v-if="message.raw">
         <span>{{message.text}}</span>
-      </div>
-      <div v-else-if="message.html">
-        <span v-html="message.text"></span>
       </div>
       <div v-else>
         <span class="nav-link font-weight-bold" v-bind:style="'color: ' + message.hashColor">{{message.username}}: </span>
@@ -98,11 +94,11 @@ const Chat = {
       }
       if (!message) return console.error('Message cannot be blank.');
       if (message.length > 300) return;
-      socket.emit('chat message', messageSchema.encode({
+      socket.emit('chat message', {
         username: state.username,
         room: roomName,
         text: message
-      }));
+      });
       this.message = '';
       this.negativeIndex = 1;
     },

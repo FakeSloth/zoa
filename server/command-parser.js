@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const demFeels = require('dem-feels');
+const {SET_LAST_MESSAGE, SET_LAST_MESSAGE_TIME} = require('./redux/users');
 
 const MAX_MESSAGE_LENGTH = 300;
 const MESSAGE_COOLDOWN = 400;
@@ -21,18 +22,32 @@ function loadCommands() {
 
 const commands = loadCommands();
 
-function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: Object */ {
+function parseSchema(object/*: Object */) {
+  return {
+    username: object.username,
+    room: object.room,
+    text: object.text,
+    raw: object.raw,
+    private: object.private,
+    date: object.date,
+    sideEffect: object.sideEffect
+  };
+}
+
+function parse(messageObject/*: Object */, room/*: Object */, user/*: Object */, store/*: Object */) /*: Object */ {
   function sendReply(text) {
-    return {raw: true, private: true, date: Date.now(), text, room: room.id};
+    return {raw: true, private: true, date: Date.now(), text, room: room.get('id')};
   }
 
-  const diff = Date.now() - user.lastMessageTime;
+  const diff = Date.now() - user.get('lastMessageTime');
   if (diff < MESSAGE_COOLDOWN) {
     return sendReply('Your message was not sent because you have sented too many messages.');
   }
-  user.lastMessageTime = Date.now();
+  store.dispatch({type: SET_LAST_MESSAGE_TIME, userId: user.get('id'), date: Date.now()});
 
-  if (!message || !message.trim().length) {
+  let message = messageObject.text.trim();
+
+  if (!message || !message.length) {
     return sendReply('Your message cannot be blank.');
   }
 
@@ -58,17 +73,7 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
     if (typeof commandHandler === 'string') {
       commandHandler = commands[commandHandler];
     }
-    const result = commandHandler(target, room, user);
-    if (result.sideEffect) {
-      if (result.text) {
-        return Object.assign(result, {raw: true, private: true, room: room.id});
-      } else {
-        return result;
-      }
-    }
-    if (result.text) {
-      return Object.assign(result, {raw: true, private: true, room: room.id});
-    }
+    return commandHandler(target, room, user,  store);
   } else if (cmdToken) {
     return sendReply('The command \'' + cmdToken + cmd + '\' was unrecognized. To send a message starting with \'' + cmdToken + cmd + '\', type \'' + cmdToken.repeat(2) + cmd + '\'.');
   } else if (isValidCmdToken && isEscapedCmd) {
@@ -84,12 +89,12 @@ function parse(message/*: string */, room/*: Object */, user/*: Object */) /*: O
   }
 
   const normalized = message.trim();
-  if ((normalized === user.lastMessage) && diff < SAME_MESSAGE_COOLDOWN) {
+  if ((normalized === user.get('lastMessage')) && diff < SAME_MESSAGE_COOLDOWN) {
     return sendReply('You can\'t send the same message again so soon.');
   }
-  user.lastMessage = normalized;
+  store.dispatch({type: SET_LAST_MESSAGE, userId: user.get('id'), message: normalized});
 
-  return {text: markup(normalized), originalText: normalized};
+  return {userMessage: markup(normalized), originalText: normalized};
 };
 
 function markup(message) {
