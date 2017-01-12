@@ -31,7 +31,15 @@ const {
 
 const log = require('winston').info;
 
-class Sockets {
+function sockets(io/*: Object */) {
+  store.dispatch({type: CREATE_ROOM, name: 'Lobby'});
+
+  io.on('connection', function(socket) {
+    new Socket(io, socket);
+  });
+}
+
+class Socket {
   /* flow-include
   io: Object;
   socket: Object;
@@ -43,10 +51,9 @@ class Sockets {
   userLeaveRoom: any;
   chatMessage: any;
   */
-  constructor(io/*: Object */) {
+  constructor(io/*: Object */, socket/*: Object */) {
     this.io = io;
-
-    store.dispatch({type: CREATE_ROOM, name: 'Lobby'});
+    this.socket = socket;
 
     this.disconnect = this.disconnect.bind(this);
     this.addChooseNameUser = this.addChooseNameUser.bind(this);
@@ -56,11 +63,8 @@ class Sockets {
     this.userLeaveRoom = this.userLeaveRoom.bind(this);
     this.chatMessage = this.chatMessage.bind(this);
 
-    io.on('connection', (socket) => {
-      this.socket = socket;
-      this.initEvents(socket);
-      this.handleEvents(socket);
-    });
+    this.initEvents(this.socket);
+    this.handleEvents(this.socket);
   }
 
   initEvents(socket/*: Object */) {
@@ -146,7 +150,7 @@ class Sockets {
       store.dispatch(createUserAction);
     }
 
-    this.socket.emit('hash color', hashColor(userId));
+    this.socket.emit('hash color', hashColor(this.socket.userId));
     this.socket.emit('chooseName success', username);
   }
 
@@ -163,7 +167,7 @@ class Sockets {
     this.socket.userId = toId(username);
     store.dispatch({type: CREATE_USER, name: username, socket: this.socket, authenticated: true});
 
-    this.socket.emit('hash color', hashColor(userId));
+    this.socket.emit('hash color', hashColor(this.socket.userId));
     this.socket.emit('chooseName success', username);
     this.socket.emit('finish add auth user');
   }
@@ -184,7 +188,11 @@ class Sockets {
   userJoinRoom(roomName/*: string */) {
     const roomId = toId(roomName);
     const userId = this.socket.userId;
-    const users = getRoom(store, roomId).get('users').filter(toId);
+    const room = getRoom(store, roomId);
+
+    if (!room) return this.err(`Room ${roomId} does not exist.`);
+
+    const users = room.get('users').filter(toId);
 
     if (this.handleRoomError(roomName)) return;
     if (users.includes(userId)) return this.err('Already in this room.');
@@ -266,4 +274,4 @@ class Sockets {
   }
 }
 
-module.exports = Sockets;
+module.exports = sockets;

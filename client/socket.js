@@ -38,7 +38,6 @@ socket.on('load room', (room) => {
 });
 
 socket.on('load room userlist', (room) => {
-  console.log(room)
   Vue.set(state.rooms[room.id], 'users', room.users);
 });
 

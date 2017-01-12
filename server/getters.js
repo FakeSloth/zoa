@@ -13,7 +13,7 @@ function getRoom(store/*: Object */, name/*: string */) {
 }
 
 function userList(users) {
-  return users.map(name => Map({name, hashColor: hashColor(name)}));
+  return users.map(name => Map({name, hashColor: hashColor(toId(name))}));
 }
 
 function getRoomData(store/*: Object */, roomId/*: string */) {
